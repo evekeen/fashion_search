@@ -1,11 +1,12 @@
 import { CLOTHING_CATEGORIES } from "@/categories";
 import { getSearchResultsReal } from "@/services/searchService";
 import { useRouter } from "next/router";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Skeleton } from "../components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { Item, SearchResponse, SearchResult, StyleResponse } from "../services/frontend";
 import { generateStyleImage } from "../services/replicateImageService";
+import Image from "next/image";
 
 type ErrorState = {
   [key: string]: string | null;
@@ -13,6 +14,7 @@ type ErrorState = {
 
 interface SearchResultWithCategory extends SearchResult {
   category: string;
+  imagePreloaded?: boolean;
 }
 
 export default function ResultsPage() {
@@ -24,6 +26,7 @@ export default function ResultsPage() {
   const [isSearching, setIsSearching] = useState(false);
   const [isImageLoading, setIsImageLoading] = useState(true);
   const [styleImage, setStyleImage] = useState<string | null>(null);
+  const [preloadedImages, setPreloadedImages] = useState<Record<string, boolean>>({});
   
   const categories = useMemo(() => 
     CLOTHING_CATEGORIES.filter((category: string) => 
@@ -66,6 +69,34 @@ export default function ResultsPage() {
     }
   }, [router.query]);
 
+  const preloadImage = (url: string): Promise<boolean> => {
+    return new Promise((resolve) => {
+      if (typeof window === 'undefined') {
+        resolve(false);
+        return;
+      }
+      const img = new window.Image();
+      img.onload = () => resolve(true);
+      img.onerror = () => resolve(false);
+      img.src = url;
+    });
+  };
+
+  const preloadCategoryImages = useCallback(async (category: string) => {
+    if (!categoryResults[category] || preloadedImages[category]) return;
+    
+    // Preload all images for this category
+    await Promise.all(
+      categoryResults[category].map(item => preloadImage(item.thumbnailURL))
+    );
+    
+    // Mark this category as preloaded
+    setPreloadedImages(prev => ({
+      ...prev,
+      [category]: true
+    }));
+  }, [categoryResults, preloadedImages]);
+
   useEffect(() => {
     const fetchSearchResults = async () => {
       if (!recommendation) return;
@@ -87,11 +118,18 @@ export default function ResultsPage() {
         return acc;
       }, {} as Record<string, SearchResultWithCategory[]>));
 
-     setIsSearching(false); 
+      setIsSearching(false);
     };
 
     fetchSearchResults();
-  }, [recommendation, setCategoryResults, setIsSearching]);  
+  }, [recommendation, setCategoryResults, setIsSearching]);
+  
+  // Preload images for active category when data loads or active category changes
+  useEffect(() => {
+    if (categoryResults[activeCategory] && !isSearching) {
+      preloadCategoryImages(activeCategory);
+    }
+  }, [activeCategory, categoryResults, isSearching, preloadCategoryImages]);  
 
   if (!recommendation || errors.parsing) {
     return (
@@ -171,6 +209,8 @@ export default function ResultsPage() {
               key={category}
               value={category}
               onClick={() => setActiveCategory(category)}
+              onMouseEnter={() => preloadCategoryImages(category)}
+              onFocus={() => preloadCategoryImages(category)}
               className="px-4 py-2 text-gray-600 hover:text-gray-900"
             >
               {category}
