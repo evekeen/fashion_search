@@ -36,6 +36,7 @@ export interface Style {
 }
 
 interface Item {
+  short_description: string
   description: string
   category: string
 }
@@ -71,6 +72,7 @@ const styleResponseSchema: z.ZodType<StyleResponse> = z.object({
   }),
   items: z.array(z.object({
     description: z.string(),
+    short_description: z.string(),
     category: z.string()
   }))
 });
@@ -194,6 +196,7 @@ Please return your response in the following JSON format EXACTLY:
     "items": [
         {
             "description": "Detailed description of the recommended item",
+            "short_description": "Short description of the recommended item",
             "category": "Category (must be one of: Tops, Bottoms, Dresses, Outerwear, Accessories)"
         },
         ...
@@ -311,10 +314,12 @@ User preferences:
           items: [
             {
               description: `Fashion item matching ${additionalInfo}`,
+              short_description: `Black t-shirt`,
               category: "Tops"
             },
             {
               description: `Fashion item for ${budget} budget`,
+              short_description: `Black jeans`,
               category: "Bottoms"
             }
           ]
@@ -331,10 +336,12 @@ User preferences:
         items: [
           {
             description: `Fashion item matching ${additionalInfo}`,
+            short_description: `Black t-shirt`,
             category: "Tops"
           },
           {
             description: `Fashion item for ${budget} budget`,
+            short_description: `Black jeans`,
             category: "Bottoms"
           }
         ]
@@ -352,10 +359,12 @@ User preferences:
       items: [
         {
           description: `Fashion item matching ${additionalInfo}`,
+          short_description: `Black t-shirt`,
           category: "Tops"
         },
         {
           description: `Fashion item for ${budget} budget`,
+          short_description: `Black jeans`,
           category: "Bottoms"
         }
       ]
@@ -372,10 +381,12 @@ User preferences:
     items: [
       {
         description: `Fashion item matching ${additionalInfo}`,
+        short_description: `Black t-shirt`,
         category: "Tops"
       },
       {
         description: `Fashion item for ${budget} budget`,
+        short_description: `Black jeans`,
         category: "Bottoms"
       }
     ]
@@ -391,9 +402,12 @@ export async function generateStyleImageWithDalle(recommendations: StyleResponse
     throw new Error('Style description is required for image generation')
   }
 
-  const prompt = `Generate a fashion style image based on: ${recommendations.style.description}. 
-  The image should be high quality, photorealistic, and showcase the fashion style described. 
-  Include a person wearing the style in a natural setting.`
+  const prompt = `Generate a fashion style image based on: ${recommendations.style.description}
+    Output separate clothing items in the image for each category of items in the style.
+    <Items>
+      ${recommendations.items.map(item => item.short_description).join('\n')}
+    </Items>
+  `
   
   try {
     console.log("Generating style image with DALL-E...")

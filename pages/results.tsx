@@ -189,7 +189,7 @@ export default function ResultsPage() {
         <h2 className="text-2xl font-bold mb-8">Recommended Aesthetic</h2>
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
           <div className="flex">
-            <div className="w-1/3 h-[240px]">
+            <div className="w-1/3 aspect-square h-[240px] w-[240px]">
               {isImageLoading ? (
                 <div className="w-full h-full flex items-center justify-center bg-gray-100">
                   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
@@ -200,7 +200,6 @@ export default function ResultsPage() {
                   alt="Style aesthetic" 
                   className="w-full h-full object-cover"
                   onError={(e) => {
-                    // Fallback if the image fails to load
                     e.currentTarget.src = '/images/default-style.svg';
                     setIsImageLoading(false);
                   }}

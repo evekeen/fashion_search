@@ -24,15 +24,16 @@ export async function getFashionRecommendations(
       title: "Casual",
       description: "A casual look with a focus on comfort and versatility.",
       tags: ["casual", "comfortable", "versatile"],
-      image: "https://picsum.photos/200/300"
     },
     items: [
       {
         description: "A casual white t-shirt",
+        short_description: "White t-shirt",
         category: "Tops"
       },
       {
         description: "A pair of blue jeans",
+        short_description: "Blue jeans",
         category: "Bottoms"
       }
     ]
@@ -41,6 +42,7 @@ export async function getFashionRecommendations(
 
 interface LookItem {
   description: string;
+  short_description: string;
   category: string;
 }
 
@@ -87,4 +89,3 @@ export const getFashionRecommendationsReal = async (
   };
 
 
-  
