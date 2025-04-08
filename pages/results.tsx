@@ -1,12 +1,13 @@
-import { allCategories } from "@/categories";
-import { FashionRecommendationResponse } from "@/services/fashionService";
-import { getSearchResults, SearchResponse } from "@/services/searchService";
+import { getSearchResults, getSearchResultsReal, SearchResponse } from "@/services/searchService";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import { Skeleton } from "../components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { generateStyleImage } from "../services/replicateImageService";
 import { SearchResult } from "../services/searchService";
+import { Item, StyleResponse } from "../services/openai";
+import { CLOTHING_CATEGORIES } from "@/categories";
+
 type ErrorState = {
   [key: string]: string | null;
 };
@@ -17,7 +18,7 @@ interface SearchResultWithCategory extends SearchResult {
 
 export default function ResultsPage() {
   const router = useRouter();
-  const [recommendation, setRecommendation] = useState<FashionRecommendationResponse | null>(null);
+  const [recommendation, setRecommendation] = useState<StyleResponse | null>(null);
   const [activeCategory, setActiveCategory] = useState<string>("Tops");
   const [categoryResults, setCategoryResults] = useState<Record<string, SearchResult[]>>({});
   const [errors, setErrors] = useState<ErrorState>({});
@@ -26,10 +27,10 @@ export default function ResultsPage() {
   const [styleImage, setStyleImage] = useState<string | null>(null);
   
   const categories = useMemo(() => 
-    allCategories.filter((category: string) => 
-      recommendation?.items.some((item: any) => item.category === category)
+    CLOTHING_CATEGORIES.filter((category: string) => 
+      recommendation?.items.some((item: Item) => item.category === category)
     ),
-    [allCategories, recommendation?.items]
+    [recommendation?.items]
   );
 
   useEffect(() => {
@@ -69,7 +70,7 @@ export default function ResultsPage() {
 
       const results: SearchResultWithCategory[] = await Promise.all(
         recommendation.items.map(async item => {
-          const r: SearchResponse = await getSearchResults(item.description);
+          const r: SearchResponse = await getSearchResultsReal(item.description);
           return {
             ...r.results[0],
             category: item.category

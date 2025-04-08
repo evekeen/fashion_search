@@ -1,1 +1,8 @@
-export const allCategories = [ "Tops", "Bottoms", "Accessories", "Shoes" ];
+export const CLOTHING_CATEGORIES = [
+  "tops",
+  "bottoms",
+  "dresses",
+  "outerwear",
+  "shoes",
+  "accessories"
+];

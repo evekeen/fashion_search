@@ -4,6 +4,7 @@ import OpenAI from 'openai'
 import { zodResponseFormat } from "openai/helpers/zod"
 import path from 'path'
 import { z } from 'zod'
+import { CLOTHING_CATEGORIES } from '../categories'
 
 // Load environment variables explicitly
 dotenv.config({ path: path.join(__dirname, '../../.env') })
@@ -18,23 +19,13 @@ const client = new OpenAI({
   apiKey
 })
 
-// Define clothing categories for diverse recommendations
-const CLOTHING_CATEGORIES = [
-  "tops",
-  "bottoms",
-  "dresses",
-  "outerwear",
-  "shoes",
-  "accessories"
-]
-
 export interface Style {
   title: string
   description: string
   tags: string[]
 }
 
-interface Item {
+export interface Item {
   short_description: string
   description: string
   category: string
@@ -198,7 +189,7 @@ Please return your response in the following JSON format EXACTLY:
         {
             "description": "Detailed description of the recommended item",
             "short_description": "Short description of the recommended item",
-            "category": "Category (must be one of: Tops, Bottoms, Dresses, Outerwear, Accessories)"
+            "category": "Category (must be one of: ${CLOTHING_CATEGORIES.join(', ')})"
         },
         ...
     ]
@@ -206,7 +197,7 @@ Please return your response in the following JSON format EXACTLY:
 
 Make sure to:
 1. Include 4-6 items
-2. Use the exact category names: Tops, Bottoms, Dresses, Outerwear, or Accessories
+2. Use the exact category names: ${CLOTHING_CATEGORIES.join(', ')}
 3. Make descriptions specific and detailed
 4. Consider the provided budget level and style preferences
 5. Return ONLY the JSON, no additional text
