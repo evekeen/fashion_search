@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { StyleResponse } from './backend';
-import { generateStyleImage } from './replicateService';
+import { StyleResponse } from '../../types/api';
+import { generateStyleImageWithReplicate } from '../../services/replicate';
 
 export default async function handler(
   req: NextApiRequest,
@@ -22,10 +22,9 @@ export default async function handler(
         if (!data || !data.recommendation) {
           return res.status(400).json({ error: 'Recommendation data is required' });
         }
-        const recommendation = data.recommendation as StyleResponse;
-        const imageUrl = await generateStyleImage(recommendation);
+        const imageURL = await generateStyleImageWithReplicate(data.recommendation as StyleResponse);
         return res.status(200).json({ 
-          image: imageUrl
+          image: imageURL
         });
 
       default:
@@ -38,4 +37,4 @@ export default async function handler(
       details: error instanceof Error ? error.message : 'Unknown error'
     });
   }
-} 
+}

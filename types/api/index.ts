@@ -1,4 +1,6 @@
-// Backend-specific interfaces
+// API types for the fashion search application
+
+// Search-related types
 export interface SearchResult {
   description: string;
   price: string;
@@ -15,7 +17,7 @@ export interface SearchRequest {
   query: string;
 }
 
-// For API response handling
+// Generic API response types
 export interface ApiErrorResponse {
   error: string;
   success?: boolean;
@@ -26,6 +28,7 @@ export interface ApiSuccessResponse<T> {
   data: T;
 }
 
+// Style-related types
 export interface Style {
   title: string;
   description: string;
@@ -44,6 +47,7 @@ export interface StyleResponse {
   gender: string;
 }
 
+// User-related types
 export interface UserAttributes {
   gender_presentation?: string;
   apparent_age_range?: string;

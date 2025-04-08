@@ -1,12 +1,11 @@
 import { CLOTHING_CATEGORIES } from "@/categories";
-import { getSearchResultsReal } from "@/services/searchService";
+import { getSearchResults, getSearchResultsReal } from "@/services/searchService";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Skeleton } from "../components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { Item, SearchResponse, SearchResult, StyleResponse } from "../services/frontend";
 import { generateStyleImage } from "../services/replicateImageService";
-import Image from "next/image";
 
 type ErrorState = {
   [key: string]: string | null;
@@ -105,7 +104,7 @@ export default function ResultsPage() {
 
       const results: SearchResultWithCategory[] = await Promise.all(
         recommendation.items.map(async item => {
-          const r: SearchResponse = await getSearchResultsReal(item.description);
+          const r: SearchResponse = await getSearchResults(item.description);
           return {
             ...r.results[0],
             category: item.category

@@ -1,10 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { StyleResponse, UserInput } from './backend';
-import {
-  analyzeUserPhotos,
-  generateSearchQuery,
-  generateStyleImageWithDalle
-} from './openaiService';
+import { StyleResponse, UserInput } from '../../types/api';
+import { 
+  analyzeUserPhotos, 
+  generateSearchQuery, 
+  generateStyleImageWithDalle 
+} from '../../services/openai';
 
 export default async function handler(
   req: NextApiRequest,
@@ -55,4 +55,4 @@ export default async function handler(
       details: error instanceof Error ? error.message : 'Unknown error'
     });
   }
-} 
+}

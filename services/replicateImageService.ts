@@ -1,4 +1,4 @@
-import { StyleResponse } from './frontend.js';
+import { StyleResponse } from '../types/api';
 
 export async function generateStyleImage(recommendation: StyleResponse): Promise<string> {
   try {
@@ -24,4 +24,4 @@ export async function generateStyleImage(recommendation: StyleResponse): Promise
     console.error('Error in generateStyleImage service:', error);
     return '/images/default-style.svg';
   }
-} 
+}

@@ -1,19 +1,26 @@
-// Frontend-specific interfaces
-export interface SearchResult {
-  description: string;
-  price: string;
-  thumbnailURL: string;
-  productURL: string;
-  rating?: number;
-}
+// Frontend-specific interfaces - these should be imported from types
+import {
+  SearchResult,
+  SearchResponse,
+  SearchRequest,
+  Style,
+  Item,
+  StyleResponse,
+  UserAttributes,
+  UserInput
+} from '../types/api';
 
-export interface SearchResponse {
-  results: SearchResult[];
-}
-
-export interface SearchRequest {
-  query: string;
-}
+// Re-export types from the types directory for convenience
+export type {
+  SearchResult,
+  SearchResponse,
+  SearchRequest,
+  Style,
+  Item,
+  StyleResponse,
+  UserAttributes,
+  UserInput
+};
 
 // For recommendation components
 export interface Recommendation {
@@ -29,40 +36,4 @@ export interface Recommendation {
 
 export interface RecommendationResultsProps {
   recommendations: Recommendation[];
-}
-
-export interface Style {
-  title: string;
-  description: string;
-  tags: string[];
-}
-
-export interface Item {
-  short_description: string;
-  description: string;
-  category: string;
-}
-
-export interface StyleResponse {
-  style: Style;
-  items: Item[];
-  gender: string;
-}
-
-export interface UserAttributes {
-  gender_presentation?: string;
-  apparent_age_range?: string;
-  body_type?: string;
-  height_impression?: string;
-  skin_tone?: string;
-  style_suggestions?: string[];
-  colors_to_complement?: string[];
-  avoid_styles?: string[];
-}
-
-export interface UserInput {
-  additional_info: string;
-  budget: string;
-  profile_photo_path?: string;
-  aesthetic_photo_paths?: string[];
 }
