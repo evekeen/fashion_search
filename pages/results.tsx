@@ -1,12 +1,12 @@
-import { getSearchResults, getSearchResultsReal } from "@/services/searchService";
+import { CLOTHING_CATEGORIES } from "@/categories";
+import { getSearchResultsReal } from "@/services/searchService";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import { Skeleton } from "../components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { generateStyleImage } from "../services/replicateImageService";
-import { SearchResult, SearchResponse } from "../types/frontend";
+import { SearchResponse, SearchResult } from "../types/frontend";
 import { Item, StyleResponse } from "../types/openai";
-import { CLOTHING_CATEGORIES } from "@/categories";
 
 type ErrorState = {
   [key: string]: string | null;
@@ -55,7 +55,10 @@ export default function ResultsPage() {
     if (resultsData) {
       try {
         const parsedResults = JSON.parse(decodeURIComponent(resultsData as string));
-        setRecommendation(parsedResults);        
+        setRecommendation(parsedResults);
+        if (parsedResults?.items?.length > 0) {
+          setActiveCategory(parsedResults.items[0].category);
+        }
       } catch (error) {
         setErrors(prev => ({ ...prev, parsing: "Failed to parse results data" }));
       }
@@ -175,7 +178,7 @@ export default function ResultsPage() {
         </TabsList>
 
         {categories.map((category) => (
-          <TabsContent key={category} value={category}>
+          <TabsContent key={category} value={category} className="data-[state=inactive]:hidden">
             {isSearching && category === activeCategory ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
