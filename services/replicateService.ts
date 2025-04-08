@@ -12,7 +12,7 @@ export async function generateStyleImage(request: StyleResponse): Promise<Buffer
   }
 
   const prompt = `
-    Generate a fashion style image based on: ${request.style}.
+    Generate a fashion style image based on: ${request.style.description}.
     Display individual items of clothing together in a single image.
     items: ${request.items.map(item => item.short_description).join(', ')}.
     gender: ${request.gender}.
