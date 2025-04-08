@@ -9,7 +9,6 @@ interface StyleDescription {
   title: string;
   description: string;
   tags: string[];
-  image?: string | null;
 }
 
 export async function getFashionRecommendations(
@@ -86,3 +85,6 @@ export const getFashionRecommendationsReal = async (
     }
     return new Blob([u8arr], { type: mime });
   };
+
+
+  

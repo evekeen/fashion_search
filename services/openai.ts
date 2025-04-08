@@ -1,9 +1,9 @@
 import dotenv from 'dotenv'
 import fs from 'fs'
 import OpenAI from 'openai'
+import { zodResponseFormat } from "openai/helpers/zod"
 import path from 'path'
 import { z } from 'zod'
-import { zodResponseFormat } from "openai/helpers/zod";
 
 // Load environment variables explicitly
 dotenv.config({ path: path.join(__dirname, '../../.env') })
@@ -379,5 +379,53 @@ User preferences:
         category: "Bottoms"
       }
     ]
+  }
+}
+
+export async function generateStyleImageWithDalle(recommendations: StyleResponse): Promise<Buffer> {
+  if (!process.env.OPENAI_API_KEY) {
+    throw new Error('OpenAI API key is not configured')
+  }
+
+  if (!recommendations.style?.description) {
+    throw new Error('Style description is required for image generation')
+  }
+
+  const prompt = `Generate a fashion style image based on: ${recommendations.style.description}. 
+  The image should be high quality, photorealistic, and showcase the fashion style described. 
+  Include a person wearing the style in a natural setting.`
+  
+  try {
+    console.log("Generating style image with DALL-E...")
+    const response = await client.images.generate({
+      model: "dall-e-2",
+      prompt: prompt,
+      n: 1,
+      size: "256x256",
+      quality: "standard",
+      style: "natural"
+    })
+
+    if (!response.data || response.data.length === 0) {
+      throw new Error('No response from OpenAI API')
+    }
+
+    const imageUrl = response.data[0].url
+    if (!imageUrl) {
+      throw new Error('No image URL in OpenAI API response')
+    }
+
+    const imageResponse = await fetch(imageUrl)
+    if (!imageResponse.ok) {
+      throw new Error(`Failed to fetch image: ${imageResponse.statusText}`)
+    }
+
+    const arrayBuffer = await imageResponse.arrayBuffer()
+    return Buffer.from(arrayBuffer)
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`OpenAI API error: ${error.message}`)
+    }
+    throw new Error('An unexpected error occurred with OpenAI API')
   }
 } 

@@ -1,10 +1,11 @@
 import { allCategories } from "@/categories";
 import { FashionRecommendationResponse } from "@/services/fashionService";
-import { getSearchResultsReal, SearchResponse } from "@/services/searchService";
+import { getSearchResults, SearchResponse } from "@/services/searchService";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import { Skeleton } from "../components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import { generateStyleImage } from "../services/openaiService";
 import { SearchResult } from "../services/searchService";
 type ErrorState = {
   [key: string]: string | null;
@@ -23,6 +24,7 @@ export default function ResultsPage() {
   const [errors, setErrors] = useState<ErrorState>({});
   const [isSearching, setIsSearching] = useState(false);
   const [isImageLoading, setIsImageLoading] = useState(true);
+  const [styleImage, setStyleImage] = useState<string | null>(null);
   
   const categories = useMemo(() => 
     allCategories.filter((category: string) => 
@@ -31,6 +33,20 @@ export default function ResultsPage() {
     [allCategories, recommendation?.items]
   );
 
+  useEffect(() => {
+    if (!recommendation) return;
+
+    generateStyleImage(recommendation)
+      .then(imageData => {
+        console.log('Style image generated')
+        setStyleImage(imageData)
+      })
+      .catch(error => {
+        console.error('Error generating style image:', error)
+        setStyleImage('/images/default-style.svg')
+      });
+  }, [recommendation]);
+      
   useEffect(() => {
     const resultsData = router.query.results;
     if (resultsData) {
@@ -66,16 +82,13 @@ export default function ResultsPage() {
 
       const results: SearchResultWithCategory[] = await Promise.all(
         recommendation.items.map(async item => {
-          const r: SearchResponse = await getSearchResultsReal(item.description);
-          console.log('result', r);
+          const r: SearchResponse = await getSearchResults(item.description);
           return {
             ...r.results[0],
             category: item.category
           }
         })
       );
-
-      console.log('results', results);
 
       setCategoryResults(results.reduce((acc, curr) => {
         acc[curr.category] = [...(acc[curr.category] || []), curr];
@@ -183,7 +196,7 @@ export default function ResultsPage() {
                 </div>
               ) : (
                 <img 
-                  src={recommendation?.style?.image || '/images/default-style.svg'} 
+                  src={styleImage || '/images/default-style.svg'} 
                   alt="Style aesthetic" 
                   className="w-full h-full object-cover"
                   onError={(e) => {

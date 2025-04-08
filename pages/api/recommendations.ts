@@ -3,7 +3,6 @@ import fs from 'fs'
 import { NextApiRequest, NextApiResponse } from 'next'
 import os from 'os'
 import path from 'path'
-import { generateStyleImage } from '../../services/huggingface'
 import { generateSearchQuery, UserInput } from '../../services/openai'
 
 export const config = {
@@ -67,30 +66,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
     
     const recommendations = await generateSearchQuery(userInput)
-    
-    // Return recommendations immediately without waiting for image generation
-    recommendations.style.image = undefined
-    
-    // Start image generation in the background
-    generateStyleImage(recommendations)
-      .then(styleImage => {
-        const base64Image = Buffer.from(styleImage).toString('base64')
-        recommendations.style.image = `data:image/png;base64,${base64Image}`
-      })
-      .catch(error => {
-        console.error('Error generating style image:', error)
-        recommendations.style.image = '/images/default-style.svg'
-      })
-      .finally(() => {
-        // Cleanup temporary files
-        if (profilePhotoPath) {
-          fs.unlinkSync(profilePhotoPath)
-        }
-        for (const path of aestheticPhotoPaths) {
-          fs.unlinkSync(path)
-        }
-      })
-    
     return res.status(200).json(recommendations)
   } catch (error) {
     console.error('Error in recommendations:', error)

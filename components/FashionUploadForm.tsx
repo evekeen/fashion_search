@@ -84,13 +84,7 @@ export default function FashionUploadForm({ onSubmitSuccess }: FashionUploadForm
     setIsLoading(true);
 
     try {            
-      const response = await getFashionRecommendationsReal(inspirationImages, profileImage, budget, styleDescription);
-      
-      // Ensure the image property is set to null if it's undefined
-      if (response.style && response.style.image === undefined) {
-        response.style.image = null;
-      }
-      
+      const response = await getFashionRecommendationsReal(inspirationImages, profileImage, budget, styleDescription);      
       const encodedResults = encodeURIComponent(JSON.stringify(response));
       router.push(`/results?results=${encodedResults}`);
     } catch (err: any) {
