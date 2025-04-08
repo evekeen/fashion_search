@@ -9,11 +9,7 @@ import { Textarea } from "../components/ui/textarea";
 import { getFashionRecommendationsReal } from "../services/fashionService";
 import LoadingAnimation from "./LoadingAnimation";
 
-interface FashionUploadFormProps {
-  onSubmitSuccess?: (data: any) => void;
-}
-
-export default function FashionUploadForm({ onSubmitSuccess }: FashionUploadFormProps) {
+export default function FashionUploadForm() {
   const router = useRouter();
   // State for form inputs
   const [inspirationImages, setInspirationImages] = useState<string[]>([]);

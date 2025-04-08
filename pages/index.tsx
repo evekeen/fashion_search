@@ -7,14 +7,6 @@ import { ArrowDown } from "lucide-react";
 import { Button } from "../components/ui/button";
 
 export default function Home() {
-  const [recommendations, setRecommendations] = useState(null);
-
-  const handleFormSubmit = (data: any) => {
-    console.log("Form submitted with data:", data);
-    setRecommendations(data.recommendations);
-    document.getElementById("recommendations")?.scrollIntoView({ behavior: "smooth" });
-  };
-
   return (
     <div className="min-h-screen relative">
       <Head>
@@ -48,7 +40,7 @@ export default function Home() {
 
       {/* Fashion Upload Form */}
       <div id="fashion-upload">
-        <FashionUploadForm onSubmitSuccess={handleFormSubmit} />
+        <FashionUploadForm />
       </div>
       {/* Footer */}
       <footer className="border-t border-gray-200 py-12 mt-20 bg-black text-white">
