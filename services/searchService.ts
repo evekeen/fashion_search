@@ -30,7 +30,6 @@ export async function getSearchResults(query: string): Promise<SearchResponse> {
 }
 
 export async function getSearchResultsReal(query: string): Promise<SearchResponse> {
-    console.log('getSearchResultsReal', query);
     const response = await fetch('/api/search', {
         method: 'POST',
         headers: {

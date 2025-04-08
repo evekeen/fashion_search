@@ -27,7 +27,9 @@ export default function ResultsPage() {
   
   const categories = useMemo(() => 
     CLOTHING_CATEGORIES.filter((category: string) => 
-      recommendation?.items.some((item: Item) => item.category === category)
+      recommendation?.items.some((item: Item) => 
+        item.category.toLowerCase() === category.toLowerCase()
+      )
     ),
     [recommendation?.items]
   );
@@ -73,7 +75,6 @@ export default function ResultsPage() {
       const results: SearchResultWithCategory[] = await Promise.all(
         recommendation.items.map(async item => {
           const r: SearchResponse = await getSearchResultsReal(item.description);
-          console.log('r', r);
           return {
             ...r.results[0],
             category: item.category
