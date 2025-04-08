@@ -4,6 +4,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import os from 'os'
 import path from 'path'
 import { generateSearchQuery, UserInput } from '../../services/openai'
+import { resizeImageToMaxDimension } from '../../utils/imageProcessing'
 
 export const config = {
   api: {
@@ -43,8 +44,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     let profilePhotoPath = null
     if (files.profile_photo?.[0]) {
       const photo = files.profile_photo[0]
+      const imageBuffer = fs.readFileSync(photo.filepath)
+      const resizedBuffer = await resizeImageToMaxDimension(imageBuffer)
       profilePhotoPath = path.join(profilePhotosDir, `profile_photo_${photo.originalFilename}`)
-      fs.copyFileSync(photo.filepath, profilePhotoPath)
+      fs.writeFileSync(profilePhotoPath, resizedBuffer)
     }
     
     const aestheticPhotoPaths: string[] = []
@@ -52,8 +55,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     
     for (const [_, photo] of inspirationFiles) {
       if (photo?.[0]) {
+        const imageBuffer = fs.readFileSync(photo[0].filepath)
+        const resizedBuffer = await resizeImageToMaxDimension(imageBuffer)
         const filePath = path.join(aestheticPhotosDir, `inspiration_${photo[0].originalFilename}`)
-        fs.copyFileSync(photo[0].filepath, filePath)
+        fs.writeFileSync(filePath, resizedBuffer)
         aestheticPhotoPaths.push(filePath)
       }
     }
