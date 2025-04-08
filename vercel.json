@@ -1,17 +1,10 @@
 {
-  "buildCommand": "npm run build",
   "cleanUrls": true,
   "framework": "nextjs",
   "regions": ["iad1"],
   "git": {
     "deploymentEnabled": {
       "main": true
-    }
-  },
-  "functions": {
-    "pages/api/**/*.ts": {
-      "memory": 1024,
-      "maxDuration": 60
     }
   },
   "headers": [
