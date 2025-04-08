@@ -57,7 +57,7 @@ export default function Home() {
             <SiteLogo size="medium" />
           </div>
           <div className="flex justify-center space-x-8 mb-8">
-            <a href="https://www.sundai.club/projects/cef5b417-173f-4000-9eae-28155847b873" className="text-gray-400 hover:text-white transition-colors">
+            <a href="https://www.sundai.club/projects/cef5b417-173f-4000-9eae-28155847b873" target="_blank" className="text-gray-400 hover:text-white transition-colors">
               About
             </a>
           </div>
