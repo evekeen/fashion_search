@@ -1,4 +1,4 @@
-import { SearchResponse, SearchResult, SearchRequest } from '../types/frontend';
+import { SearchResponse, SearchResult } from './frontend.js';
 
 export async function getSearchResults(query: string): Promise<SearchResponse> {
     await new Promise((resolve) => setTimeout(resolve, 500));

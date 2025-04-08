@@ -1,10 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import { StyleResponse, UserInput } from './backend';
 import {
-    analyzeUserPhotos,
-    generateSearchQuery,
-    generateStyleImageWithDalle
-} from '../../../services/openai';
-import { StyleResponse, UserInput } from '../../../types/openai';
+  analyzeUserPhotos,
+  generateSearchQuery,
+  generateStyleImageWithDalle
+} from './openaiService';
 
 export default async function handler(
   req: NextApiRequest,

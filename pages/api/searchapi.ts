@@ -1,4 +1,4 @@
-import { SearchResult } from '../types/backend'
+import { SearchResult } from './backend'
 
 export async function searchProducts(query: string): Promise<SearchResult[]> {
   const SEARCHAPI_BASE_URL = "https://serpapi.com/search"
@@ -22,7 +22,7 @@ export async function searchProducts(query: string): Promise<SearchResult[]> {
     gl: "us",
     hl: "en",
     tbm: "shop",
-    num: 5 * 2
+    num: 10
   }
 
   try {

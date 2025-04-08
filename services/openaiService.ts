@@ -1,4 +1,4 @@
-import { StyleResponse, UserAttributes, UserInput } from '../types/openai';
+import { StyleResponse, UserAttributes, UserInput } from './frontend.js';
 
 export async function generateStyleImage(recommendation: StyleResponse): Promise<string> {
   try {

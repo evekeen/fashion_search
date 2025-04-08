@@ -26,9 +26,6 @@
     "allowSyntheticDefaultImports": true,
     "downlevelIteration": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.dts"],
   "exclude": ["node_modules", ".next", "out", ".vercel"],
-  "references": [
-    { "path": "./types" }
-  ]
 }

@@ -10,12 +10,10 @@ const nextConfig = {
   swcMinify: true,
   // Prevent micromatch stack overflow by manually excluding patterns
   typescript: {
-    // Don't run type checking during build - Vercel does this separately
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   eslint: {
-    // Don't run ESLint during build - Vercel does this separately
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
   experimental: {
     // Reduce graph complexity

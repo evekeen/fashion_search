@@ -4,9 +4,8 @@ import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import { Skeleton } from "../components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import { Item, SearchResponse, SearchResult, StyleResponse } from "../services/frontend";
 import { generateStyleImage } from "../services/replicateImageService";
-import { SearchResponse, SearchResult } from "../types/frontend";
-import { Item, StyleResponse } from "../types/openai";
 
 type ErrorState = {
   [key: string]: string | null;
@@ -74,6 +73,7 @@ export default function ResultsPage() {
       const results: SearchResultWithCategory[] = await Promise.all(
         recommendation.items.map(async item => {
           const r: SearchResponse = await getSearchResultsReal(item.description);
+          console.log('r', r);
           return {
             ...r.results[0],
             category: item.category

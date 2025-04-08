@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { StyleResponse } from '../../../types/openai';
-import { generateStyleImage } from '../../../services/replicateService';
+import { StyleResponse } from './backend';
+import { generateStyleImage } from './replicateService';
 
 export default async function handler(
   req: NextApiRequest,

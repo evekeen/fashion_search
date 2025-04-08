@@ -4,8 +4,8 @@ import OpenAI from 'openai'
 import { zodResponseFormat } from "openai/helpers/zod"
 import path from 'path'
 import { z } from 'zod'
-import { CLOTHING_CATEGORIES } from '../categories'
-import { Style, Item, StyleResponse, UserAttributes, UserInput } from '../types/openai'
+import { CLOTHING_CATEGORIES } from '../../categories'
+import { StyleResponse, UserAttributes, UserInput } from './backend'
 
 // Load environment variables explicitly
 dotenv.config({ path: path.join(__dirname, '../../.env') })
