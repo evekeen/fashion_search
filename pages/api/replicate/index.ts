@@ -22,7 +22,8 @@ export default async function handler(
         if (!data || !data.recommendation) {
           return res.status(400).json({ error: 'Recommendation data is required' });
         }
-        const imageUrl = await generateStyleImage(data.recommendation as StyleResponse);
+        const recommendation = data.recommendation as StyleResponse;
+        const imageUrl = await generateStyleImage(recommendation);
         return res.status(200).json({ 
           image: imageUrl
         });

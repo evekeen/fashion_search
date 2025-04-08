@@ -1,18 +1,22 @@
 import { StyleResponse } from './openai';
 
-
-export async function generateStyleImage(recommendations: StyleResponse): Promise<Buffer> {
+export async function generateStyleImage(request: StyleResponse): Promise<Buffer> {
   if (!process.env.REPLICATE_API_TOKEN) {
     console.error('Replicate API token is missing');
     throw new Error('Replicate API token is not configured');
   }
 
-  if (!recommendations.style?.description) {
-    console.error('Style description is missing from recommendations:', recommendations);
+  if (!request.style) {
+    console.error('Style description is missing from recommendations:', request);
     throw new Error('Style description is required for image generation');
   }
 
-  const prompt = `Generate a fashion style image based on: ${recommendations.style.description}`;
+  const prompt = `
+    Generate a fashion style image based on: ${request.style}.
+    Display individual items of clothing together in a single image.
+    items: ${request.items.map(item => item.short_description).join(', ')}.
+    gender: ${request.gender}.
+  `;
   console.log('Generated prompt:', prompt);
 
   try {

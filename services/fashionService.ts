@@ -1,22 +1,12 @@
 import axios from "axios";
-
-export interface FashionRecommendationResponse {
-  style: StyleDescription;
-  items: Array<LookItem>;   
-}
-
-interface StyleDescription {
-  title: string;
-  description: string;
-  tags: string[];
-}
+import { StyleResponse } from "./openai";
 
 export async function getFashionRecommendations(
     inspirationImages: string[],
     userImage: string,
     budget: string,
     additionalInfo: string
-): Promise<FashionRecommendationResponse> {
+): Promise<StyleResponse> {
   await new Promise(resolve => setTimeout(resolve, 1500));
 
   return {
@@ -25,6 +15,7 @@ export async function getFashionRecommendations(
       description: "A casual look with a focus on comfort and versatility.",
       tags: ["casual", "comfortable", "versatile"],
     },
+    gender: "female",
     items: [
       {
         description: "A casual white t-shirt",
@@ -40,18 +31,12 @@ export async function getFashionRecommendations(
   };
 }
 
-interface LookItem {
-  description: string;
-  short_description: string;
-  category: string;
-}
-
 export const getFashionRecommendationsReal = async (
     inspirationImages: string[],
     userImage: string,
     budget: string,
     additionalInfo: string
-  ): Promise<FashionRecommendationResponse> => {
+  ): Promise<StyleResponse> => {
     const formData = new FormData();
   
     inspirationImages.forEach((image, index) => {
@@ -63,7 +48,7 @@ export const getFashionRecommendationsReal = async (
     formData.append("budget", budget);
     formData.append("additional_info", additionalInfo);
   
-    const response = await axios.post<FashionRecommendationResponse>(
+    const response = await axios.post<StyleResponse>(
       "/api/recommendations",
       formData,
       {

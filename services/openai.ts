@@ -32,7 +32,6 @@ export interface Style {
   title: string
   description: string
   tags: string[]
-  image?: string
 }
 
 interface Item {
@@ -44,6 +43,7 @@ interface Item {
 export interface StyleResponse {
   style: Style
   items: Item[]
+  gender: string
 }
 
 export interface UserAttributes {
@@ -74,7 +74,8 @@ const styleResponseSchema: z.ZodType<StyleResponse> = z.object({
     description: z.string(),
     short_description: z.string(),
     category: z.string()
-  }))
+  })),
+  gender: z.string()
 });
 
 const userAttributesSchema: z.ZodType<UserAttributes> = z.object({
@@ -285,48 +286,26 @@ User preferences:
 
     const responseText = response.choices[0].message.content?.trim() || ""
 
-    // Try to parse the JSON response
-    try {
-      // Find JSON object in the response
-      const startIdx = responseText.indexOf('{')
-      const endIdx = responseText.lastIndexOf('}') + 1
+    // Find JSON object in the response
+    const startIdx = responseText.indexOf('{')
+    const endIdx = responseText.lastIndexOf('}') + 1
 
-      if (startIdx >= 0 && endIdx > startIdx) {
-        const jsonStr = responseText.substring(startIdx, endIdx)
-        const recommendations = JSON.parse(jsonStr)
+    if (startIdx >= 0 && endIdx > startIdx) {
+      const jsonStr = responseText.substring(startIdx, endIdx)
+      const recommendations = JSON.parse(jsonStr)
 
-        // Validate the structure
-        if ("style" in recommendations && "items" in recommendations) {
-          if ("title" in recommendations.style && "description" in recommendations.style && "tags" in recommendations.style) {
-            return recommendations as StyleResponse
-          } else {
-            console.log("Invalid style format in response, here's the response: ", jsonStr)
+      if ("style" in recommendations && "items" in recommendations) {
+        if ("title" in recommendations.style && "description" in recommendations.style && "tags" in recommendations.style) {
+          return {
+            ...recommendations,
+            gender: userAttributes.gender_presentation || "unisex"
           }
-        }
-
-        // If we get here, the response wasn't in the correct format
-        return {
-          style: {
-            title: "Casual",
-            description: "Casual style",
-            tags: ["casual", "comfortable", "everyday"]
-          },
-          items: [
-            {
-              description: `Fashion item matching ${additionalInfo}`,
-              short_description: `Black t-shirt`,
-              category: "Tops"
-            },
-            {
-              description: `Fashion item for ${budget} budget`,
-              short_description: `Black jeans`,
-              category: "Bottoms"
-            }
-          ]
+        } else {
+          console.log("Invalid style format in response, here's the response: ", jsonStr)
         }
       }
-    } catch (e) {
-      // Fallback if JSON parsing fails
+
+      // If we get here, the response wasn't in the correct format
       return {
         style: {
           title: "Casual",
@@ -344,40 +323,21 @@ User preferences:
             short_description: `Black jeans`,
             category: "Bottoms"
           }
-        ]
+        ],
+        gender: "female"
       }
     }
   } catch (e) {
-    console.log(`Error calling OpenAI API: ${e}`)
-    // Fallback to a basic response
-    return {
-      style: {
-        title: "Casual",
-        description: "Casual style",
-        tags: ["casual", "comfortable", "everyday"]
-      },
-      items: [
-        {
-          description: `Fashion item matching ${additionalInfo}`,
-          short_description: `Black t-shirt`,
-          category: "Tops"
-        },
-        {
-          description: `Fashion item for ${budget} budget`,
-          short_description: `Black jeans`,
-          category: "Bottoms"
-        }
-      ]
-    }
+    console.log(`Error calling OpenAI API: ${e}`)    
   }
 
-  // This should never be reached, but TypeScript needs it
   return {
     style: {
       title: "Casual",
       description: "Casual style",
       tags: ["casual", "comfortable", "everyday"]
     },
+    gender: "female",
     items: [
       {
         description: `Fashion item matching ${additionalInfo}`,
