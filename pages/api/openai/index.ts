@@ -27,10 +27,9 @@ export default async function handler(
         if (!data || !data.recommendation) {
           return res.status(400).json({ error: 'Recommendation data is required' });
         }
-        const imageBuffer = await generateStyleImageWithDalle(data.recommendation as StyleResponse);
-        const base64Image = imageBuffer.toString('base64');
+        const imageURL = await generateStyleImageWithDalle(data.recommendation as StyleResponse);
         return res.status(200).json({ 
-          image: `data:image/png;base64,${base64Image}` 
+          image: imageURL
         });
 
       case 'generateSearchQuery':

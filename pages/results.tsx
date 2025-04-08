@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import { Skeleton } from "../components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
-import { generateStyleImage } from "../services/openaiService";
+import { generateStyleImage } from "../services/replicateImageService";
 import { SearchResult } from "../services/searchService";
 type ErrorState = {
   [key: string]: string | null;
@@ -19,7 +19,6 @@ export default function ResultsPage() {
   const router = useRouter();
   const [recommendation, setRecommendation] = useState<FashionRecommendationResponse | null>(null);
   const [activeCategory, setActiveCategory] = useState<string>("Tops");
-  const [isLoading, setIsLoading] = useState(true);
   const [categoryResults, setCategoryResults] = useState<Record<string, SearchResult[]>>({});
   const [errors, setErrors] = useState<ErrorState>({});
   const [isSearching, setIsSearching] = useState(false);
@@ -37,13 +36,16 @@ export default function ResultsPage() {
     if (!recommendation) return;
 
     generateStyleImage(recommendation)
-      .then(imageData => {
-        console.log('Style image generated')
-        setStyleImage(imageData)
+      .then(imageURL => {
+        console.log(`Style image generated with Replicate: ${imageURL}`)
+        setStyleImage(imageURL)
       })
       .catch(error => {
         console.error('Error generating style image:', error)
         setStyleImage('/images/default-style.svg')
+      })
+      .finally(() => {
+        setIsImageLoading(false)
       });
   }, [recommendation]);
       
@@ -52,24 +54,9 @@ export default function ResultsPage() {
     if (resultsData) {
       try {
         const parsedResults = JSON.parse(decodeURIComponent(resultsData as string));
-        setRecommendation(parsedResults);
-        
-        // If the image is already available (including default image), don't show spinner
-        if (parsedResults.style?.image) {
-          setIsImageLoading(false);
-        } else {
-          // Set a timeout to stop the spinner after a reasonable time
-          // in case the image generation fails silently
-          const timeoutId = setTimeout(() => {
-            setIsImageLoading(false);
-          }, 10000); // 10 seconds timeout
-          
-          return () => clearTimeout(timeoutId);
-        }
+        setRecommendation(parsedResults);        
       } catch (error) {
         setErrors(prev => ({ ...prev, parsing: "Failed to parse results data" }));
-      } finally {
-        setIsLoading(false);
       }
     }
   }, [router.query]);
@@ -99,54 +86,7 @@ export default function ResultsPage() {
     };
 
     fetchSearchResults();
-  }, [recommendation, setCategoryResults, setIsSearching]);
-
-  if (isLoading) {
-    return (
-      <div className="container mx-auto px-4 py-16">
-        <div className="mb-16">
-          <div className="flex justify-between items-center mb-4">
-            <Skeleton className="h-10 w-64" />
-            <Skeleton className="h-10 w-32" />
-          </div>
-          <Skeleton className="h-6 w-96 mb-12" />
-
-          <h2 className="text-2xl font-bold mb-8">Recommended Aesthetic</h2>
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-            <div className="flex">
-              <Skeleton className="w-1/3 h-[240px]" />
-              <div className="w-2/3 p-8">
-                <Skeleton className="h-8 w-48 mb-4" />
-                <Skeleton className="h-4 w-full mb-2" />
-                <Skeleton className="h-4 w-3/4 mb-6" />
-                <div className="flex gap-3">
-                  <Skeleton className="h-8 w-20" />
-                  <Skeleton className="h-8 w-24" />
-                  <Skeleton className="h-8 w-16" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <h2 className="text-2xl font-bold mb-6">Recommended Items</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="bg-white rounded-lg overflow-hidden shadow-sm">
-              <Skeleton className="aspect-w-1 aspect-h-1 w-full" />
-              <div className="p-4">
-                <Skeleton className="h-4 w-3/4 mb-2" />
-                <div className="flex justify-between items-center">
-                  <Skeleton className="h-6 w-20" />
-                  <Skeleton className="h-10 w-28" />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
+  }, [recommendation, setCategoryResults, setIsSearching]);  
 
   if (!recommendation || errors.parsing) {
     return (
@@ -201,9 +141,7 @@ export default function ResultsPage() {
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     e.currentTarget.src = '/images/default-style.svg';
-                    setIsImageLoading(false);
                   }}
-                  onLoad={() => setIsImageLoading(false)}
                 />
               )}
             </div>
