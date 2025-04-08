@@ -1,21 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { FiStar, FiExternalLink } from 'react-icons/fi';
-
-type Recommendation = {
-  title: string;
-  link: string;
-  source: string;
-  price: string;
-  thumbnail: string;
-  rating?: number;
-  reviews?: number;
-  extensions: string[];
-};
-
-interface RecommendationResultsProps {
-  recommendations: Recommendation[];
-}
+import { Recommendation, RecommendationResultsProps } from '../types/frontend';
 
 const RecommendationResults: React.FC<RecommendationResultsProps> = ({ recommendations }) => {
   return (

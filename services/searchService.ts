@@ -1,17 +1,4 @@
-export interface SearchResponse {
-    results: SearchResult[];
-}
-
-export interface SearchResult {
-    description: string;
-    price: string;
-    thumbnailURL: string;
-    productURL: string;
-}
-
-export interface SearchRequest {
-    query: string;
-}
+import { SearchResponse, SearchResult, SearchRequest } from '../types/frontend';
 
 export async function getSearchResults(query: string): Promise<SearchResponse> {
     await new Promise((resolve) => setTimeout(resolve, 500));

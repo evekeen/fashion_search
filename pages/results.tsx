@@ -1,11 +1,11 @@
-import { getSearchResults, getSearchResultsReal, SearchResponse } from "@/services/searchService";
+import { getSearchResults, getSearchResultsReal } from "@/services/searchService";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import { Skeleton } from "../components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { generateStyleImage } from "../services/replicateImageService";
-import { SearchResult } from "../services/searchService";
-import { Item, StyleResponse } from "../services/openai";
+import { SearchResult, SearchResponse } from "../types/frontend";
+import { Item, StyleResponse } from "../types/openai";
 import { CLOTHING_CATEGORIES } from "@/categories";
 
 type ErrorState = {

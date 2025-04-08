@@ -1,4 +1,4 @@
-import { StyleResponse } from './openai';
+import { StyleResponse } from '../types/openai';
 
 export async function generateStyleImage(request: StyleResponse): Promise<Buffer> {
   if (!process.env.REPLICATE_API_TOKEN) {

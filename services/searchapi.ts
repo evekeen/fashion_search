@@ -1,10 +1,4 @@
-interface SearchResult {
-  description: string
-  price: string
-  thumbnailURL: string
-  productURL: string
-  rating?: number
-}
+import { SearchResult } from '../types/backend'
 
 export async function searchProducts(query: string): Promise<SearchResult[]> {
   const SEARCHAPI_BASE_URL = "https://serpapi.com/search"

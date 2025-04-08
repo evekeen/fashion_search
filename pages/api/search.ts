@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { searchProducts } from '../../services/searchapi'
+import { SearchResponse, ApiErrorResponse } from '../../types/backend'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {

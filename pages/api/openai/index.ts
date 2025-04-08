@@ -2,10 +2,9 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import {
     analyzeUserPhotos,
     generateSearchQuery,
-    generateStyleImageWithDalle,
-    StyleResponse,
-    UserInput
+    generateStyleImageWithDalle
 } from '../../../services/openai';
+import { StyleResponse, UserInput } from '../../../types/openai';
 
 export default async function handler(
   req: NextApiRequest,

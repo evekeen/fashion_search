@@ -3,7 +3,8 @@ import fs from 'fs'
 import { NextApiRequest, NextApiResponse } from 'next'
 import os from 'os'
 import path from 'path'
-import { generateSearchQuery, UserInput } from '../../services/openai'
+import { generateSearchQuery } from '../../services/openai'
+import { UserInput } from '../../types/openai'
 import { resizeImageToMaxDimension } from '../../utils/imageProcessing'
 
 export const config = {

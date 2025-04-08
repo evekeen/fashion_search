@@ -1,4 +1,4 @@
-import { StyleResponse } from './openai';
+import { StyleResponse } from '../types/openai';
 
 export async function generateStyleImage(recommendation: StyleResponse): Promise<string> {
   try {

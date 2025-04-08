@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { StyleResponse } from '../../../services/openai';
+import { StyleResponse } from '../../../types/openai';
 import { generateStyleImage } from '../../../services/replicateService';
 
 export default async function handler(

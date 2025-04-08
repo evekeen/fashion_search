@@ -1,5 +1,5 @@
 import axios from "axios";
-import { StyleResponse } from "./openai";
+import { StyleResponse } from "../types/openai";
 
 export async function getFashionRecommendations(
     inspirationImages: string[],

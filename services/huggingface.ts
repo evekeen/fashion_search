@@ -1,5 +1,5 @@
 import { HfInference } from '@huggingface/inference'
-import { StyleResponse } from './openai'
+import { StyleResponse } from '../types/openai'
 
 const hf = new HfInference(process.env.HUGGINGFACE_API_KEY)
 
