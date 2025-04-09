@@ -126,6 +126,7 @@ User preferences:
   }
 
   try {
+    console.log("Calling OpenAI for style generation");
     const response = await openaiClient.chat.completions.create({
       model: "gpt-4o-mini",
       messages,
@@ -142,18 +143,20 @@ User preferences:
 
     if (startIdx >= 0 && endIdx > startIdx) {
       const jsonStr = responseText.substring(startIdx, endIdx);
+      try {
       const recommendations = JSON.parse(jsonStr);
 
       if ("style" in recommendations && "items" in recommendations) {
         if ("title" in recommendations.style && "description" in recommendations.style && "tags" in recommendations.style) {
-          return {
-            ...recommendations,
-            gender: userAttributes.gender_presentation || "unisex"
-          };
+          console.log("Successfully retrieved style response from OpenAI");
+          return recommendations;
         } else {
           console.log("Invalid style format in response, here's the response: ", jsonStr);
         }
       }
+    } catch (e) {
+      console.log("Error parsing JSON in response, here's the response: ", jsonStr);      
+    }
 
       // If we get here, the response wasn't in the correct format
       return {
