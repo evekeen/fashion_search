@@ -154,11 +154,11 @@ export default function ResultsPage() {
   return (
     <div className="container mx-auto px-4 py-16">
       <div className="mb-16">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-4xl font-bold">Your Personalized Results</h1>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+          <h1 className="text-3xl sm:text-4xl font-bold">Your Personalized Results</h1>
           <button
             onClick={() => router.push('/')}
-            className="flex items-center bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition-colors"
+            className="flex items-center bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition-colors w-full sm:w-auto justify-center sm:justify-start"
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -166,12 +166,12 @@ export default function ResultsPage() {
             Back to Home
           </button>
         </div>
-        <p className="text-xl text-gray-600 mb-12">Based on your style preferences, we've curated these recommendations just for you.</p>
+        <p className="text-lg sm:text-xl text-gray-600 mb-12">Based on your style preferences, we've curated these recommendations just for you.</p>
 
         <h2 className="text-2xl font-bold mb-8">Recommended Aesthetic</h2>
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-          <div className="flex">
-            <div className="w-1/3 aspect-square h-[240px] w-[240px]">
+          <div className="flex flex-col md:flex-row">
+            <div className="w-full md:w-1/3 aspect-square h-[240px] mx-auto md:mx-0">
               {isImageLoading ? (
                 <div className="w-full h-full flex items-center justify-center bg-gray-100">
                   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
@@ -187,10 +187,10 @@ export default function ResultsPage() {
                 />
               )}
             </div>
-            <div className="w-2/3 p-8">
-              <h3 className="text-2xl font-bold mb-4">{recommendation?.style.title}</h3>
+            <div className="w-full md:w-2/3 p-6 md:p-8">
+              <h3 className="text-xl md:text-2xl font-bold mb-4">{recommendation?.style.title}</h3>
               <p className="text-gray-600 mb-6">{recommendation?.style.description}</p>
-              <div className="flex gap-3">
+              <div className="flex flex-wrap gap-3">
                 {recommendation?.style.tags.map((tag: string) => (
                   <span key={tag} className="px-4 py-2 bg-gray-100 rounded-full text-sm">{tag}</span>
                 ))}
