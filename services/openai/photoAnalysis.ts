@@ -5,7 +5,7 @@ import { UserAttributes } from '../../types/api';
 import { openaiClient } from './client';
 
 const userAttributesSchema: z.ZodType<UserAttributes> = z.object({
-  gender_presentation: z.string().optional(),
+  gender: z.string().optional(),
   apparent_age_range: z.string().optional(),
   body_type: z.string().optional(),
   height_impression: z.string().optional(),
@@ -27,7 +27,7 @@ export async function analyzeUserPhotos(userPhotoPaths: string[]): Promise<UserA
       content: `You are a fashion expert and personal stylist. Analyze the provided photos of a person to extract 
       physical attributes relevant for fashion recommendations. Be respectful, inclusive, and focus only on attributes 
       that would help with clothing recommendations. Provide your analysis in JSON format with the following fields:
-      - gender_presentation: The apparent gender presentation (masculine, feminine, androgynous, etc.)
+      - gender: The apparent gender (man, woman, non-binary)
       - apparent_age_range: Estimated age range (e.g., "18-25", "25-35", "35-50", etc.)
       - body_type: Body shape and proportions (e.g., rectangle, hourglass, athletic, pear, apple, etc.)
       - height_impression: Impression of height (tall, average, petite)

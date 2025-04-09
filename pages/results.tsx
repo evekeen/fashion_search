@@ -104,7 +104,9 @@ export default function ResultsPage() {
 
       try {
         // Create an array of search queries from item descriptions
-        const searchQueries = recommendation.items.map(item => item.description);
+        const searchQueries = recommendation.items.map(item => {
+          return `${item.description} ${recommendation.gender} gender`;
+        });
         
         // Use batch search to fetch all results at once
         const batchResults = await getBatchSearchResults(searchQueries);

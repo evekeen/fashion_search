@@ -3,6 +3,7 @@ import { SearchResult } from '../../types/api';
 interface SerperSearchParams {
   q: string;
   location?: string;
+  num?: number;
 }
 
 interface SerperShoppingResult {
@@ -76,7 +77,8 @@ export async function searchProducts(query: string): Promise<SearchResult[]> {
     // Build request body
     const requestBody: SerperSearchParams = {
       q: `${query} fashion clothing`,
-      location: "United States"
+      location: "United States",
+      num: 10
     };
     
     // Make the API request
@@ -157,7 +159,8 @@ export async function batchSearchProducts(
           // Build request body
           const requestBody: SerperSearchParams = {
             q: `${query} fashion clothing`,
-            location: "United States"
+            location: "United States",
+            num: 10
           };
           
           // Make the API request

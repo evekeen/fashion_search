@@ -49,7 +49,7 @@ export interface StyleResponse {
 
 // User-related types
 export interface UserAttributes {
-  gender_presentation?: string;
+  gender?: string;
   apparent_age_range?: string;
   body_type?: string;
   height_impression?: string;
