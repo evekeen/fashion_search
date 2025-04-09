@@ -198,12 +198,12 @@ User preferences:
           {
             description: `Fashion item matching ${additionalInfo}`,
             short_description: `Black t-shirt`,
-            category: "Tops"
+            category: "tops"
           },
           {
             description: `Fashion item for ${budget} budget`,
             short_description: `Black jeans`,
-            category: "Bottoms"
+            category: "bottoms"
           }
         ],
         gender: "female"
@@ -224,12 +224,12 @@ User preferences:
       {
         description: `Fashion item matching ${additionalInfo}`,
         short_description: `Black t-shirt`,
-        category: "Tops"
+        category: "tops"
       },
       {
         description: `Fashion item for ${budget} budget`,
         short_description: `Black jeans`,
-        category: "Bottoms"
+        category: "bottoms"
       }
     ]
   };

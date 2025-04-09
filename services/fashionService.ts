@@ -20,12 +20,12 @@ export async function getFashionRecommendations(
       {
         description: "A casual white t-shirt",
         short_description: "White t-shirt",
-        category: "Tops"
+        category: "tops"
       },
       {
         description: "A pair of blue jeans",
         short_description: "Blue jeans",
-        category: "Bottoms"
+        category: "bottoms"
       }
     ]
   };
