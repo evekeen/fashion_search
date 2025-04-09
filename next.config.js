@@ -13,7 +13,6 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: false,
   },
-  outputFileTracingRoot: join(__dirname, '../../'),
   outputFileTracingExcludes: {
     '*': [
       'node_modules/**/*',
