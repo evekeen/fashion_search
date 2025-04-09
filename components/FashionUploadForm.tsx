@@ -1,9 +1,8 @@
 import { Sparkles, Upload, UserCircle2, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import React, { useRef, useState, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button } from "../components/ui/button";
-import { Card, CardContent } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
 import { getFashionRecommendationsReal } from "../services/fashionService";
@@ -15,7 +14,6 @@ export default function FashionUploadForm() {
   const [inspirationImages, setInspirationImages] = useState<string[]>([]);
   const [profileImage, setProfileImage] = useState<string>("");
   const [styleDescription, setStyleDescription] = useState("");
-  const [budget, setBudget] = useState<"Low" | "Medium" | "High">("Medium");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [validationError, setValidationError] = useState("");
@@ -123,7 +121,7 @@ export default function FashionUploadForm() {
     setIsLoading(true);
 
     try {            
-      const response = await getFashionRecommendationsReal(inspirationImages, profileImage, budget, styleDescription);      
+      const response = await getFashionRecommendationsReal(inspirationImages, profileImage, "Medium", styleDescription);      
       const encodedResults = encodeURIComponent(JSON.stringify(response));
       router.push(`/results?results=${encodedResults}`);
     } catch (err: any) {
@@ -148,14 +146,14 @@ export default function FashionUploadForm() {
               <form onSubmit={handleSubmit} className="p-8">
                 <h2 className="text-2xl font-bold mb-6 text-center">Find Your Perfect Style Match</h2>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                  <div className="order-1 md:order-1">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                  <div className="order-1 md:order-1 md:col-span-1 max-w-xs mx-auto">
                     <h3 className="text-lg font-medium mb-3">Your Profile Picture</h3>
                     <p className="text-gray-500 text-sm mb-4">
                       Upload a photo of yourself to personalize your experience
                     </p>
                     
-                    <div className="flex justify-center mb-4">
+                    <div className="flex justify-start mb-4">
                       {profileImage ? (
                         <div className="relative w-40 h-40">
                           <Image 
@@ -193,7 +191,7 @@ export default function FashionUploadForm() {
                     />
                   </div>
                   
-                  <div className="order-2 md:order-2">
+                  <div className="order-2 md:order-2 md:col-span-2">
                     <h3 className="text-lg font-medium mb-3">Upload Inspiration</h3>
                     <p className="text-gray-500 text-sm mb-4">
                       Share images of styles you love or want to emulate
@@ -236,46 +234,6 @@ export default function FashionUploadForm() {
                       className="hidden"
                       multiple
                     />
-                  </div>
-                </div>
-                
-                {/* Budget Selection */}
-                <div className="mb-8">
-                  <h3 className="text-lg font-medium mb-3">Select Your Budget</h3>
-                  <div className="flex space-x-4">
-                    <label className="flex items-center">
-                      <input
-                        type="radio"
-                        name="budget"
-                        value="Low"
-                        checked={budget === "Low"}
-                        onChange={() => setBudget("Low")}
-                        className="mr-2"
-                      />
-                      <span>Low</span>
-                    </label>
-                    <label className="flex items-center">
-                      <input
-                        type="radio"
-                        name="budget"
-                        value="Medium"
-                        checked={budget === "Medium"}
-                        onChange={() => setBudget("Medium")}
-                        className="mr-2"
-                      />
-                      <span>Medium</span>
-                    </label>
-                    <label className="flex items-center">
-                      <input
-                        type="radio"
-                        name="budget"
-                        value="High"
-                        checked={budget === "High"}
-                        onChange={() => setBudget("High")}
-                        className="mr-2"
-                      />
-                      <span>High</span>
-                    </label>
                   </div>
                 </div>
                 
