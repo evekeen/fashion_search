@@ -1,10 +1,10 @@
 import { CLOTHING_CATEGORIES } from "@/categories";
-import { getBatchSearchResults, getSearchResults, getSearchResultsReal } from "@/services/searchService";
+import { getBatchSearchResults } from "@/services/searchService";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Skeleton } from "../components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
-import { Item, SearchResponse, SearchResult, StyleResponse } from "../services/frontend";
+import { Item, SearchResult, StyleResponse } from "../services/frontend";
 import { generateStyleImage } from "../services/replicateImageService";
 
 type ErrorState = {
@@ -305,14 +305,14 @@ export default function ResultsPage() {
                   </button>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {categoryResults[category]?.map((item: SearchResult, index: number) => (
                     <div key={index} className="bg-white rounded-lg overflow-hidden shadow-sm relative group">
                       <div className="aspect-w-1 aspect-h-1">
                         <img
                           src={item.thumbnailURL}
                           alt={item.description}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover max-w-[180px] mx-auto"
                           onError={(e) => {
                             e.currentTarget.src = 'https://picsum.photos/400/400';
                           }}
