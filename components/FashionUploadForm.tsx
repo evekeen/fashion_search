@@ -272,7 +272,7 @@ export default function FashionUploadForm() {
                     </span>
                   ) : (
                     <span className="flex items-center justify-center">
-                      <Sparkles className="mr-2 h-5 w-5" /> Generate Personalized Recommendations
+                      <Sparkles className="mr-2 h-5 w-5" /> Get Personalized Recommendations
                     </span>
                   )}
                 </Button>
