@@ -1,7 +1,7 @@
 import { Sparkles, Upload, UserCircle2, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import { Input } from "../components/ui/input";
@@ -20,6 +20,26 @@ export default function FashionUploadForm() {
   const [error, setError] = useState("");
   const [validationError, setValidationError] = useState("");
 
+  // Load saved images from localStorage on initial render
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedProfileImage = localStorage.getItem('userProfileImage');
+      const savedInspirationImages = localStorage.getItem('userInspirationImages');
+      
+      if (savedProfileImage) {
+        setProfileImage(savedProfileImage);
+      }
+      
+      if (savedInspirationImages) {
+        try {
+          setInspirationImages(JSON.parse(savedInspirationImages));
+        } catch (e) {
+          console.error('Error parsing saved inspiration images:', e);
+        }
+      }
+    }
+  }, []);
+
   // References for file inputs
   const inspirationInputRef = useRef<HTMLInputElement>(null);
   const profileInputRef = useRef<HTMLInputElement>(null);
@@ -31,7 +51,14 @@ export default function FashionUploadForm() {
       Array.from(files).forEach(file => {
         const reader = new FileReader();
         reader.onload = (e) => {
-          setInspirationImages((prev) => [...prev, e.target?.result as string]);
+          setInspirationImages((prev) => {
+            const updatedImages = [...prev, e.target?.result as string];
+            // Save to localStorage
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('userInspirationImages', JSON.stringify(updatedImages));
+            }
+            return updatedImages;
+          });
         };
         reader.readAsDataURL(file);
       });
@@ -45,7 +72,12 @@ export default function FashionUploadForm() {
       const file = files[0];
       const reader = new FileReader();
       reader.onload = (e) => {
-        setProfileImage(e.target?.result as string);
+        const imageDataUrl = e.target?.result as string;
+        setProfileImage(imageDataUrl);
+        // Save to localStorage
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('userProfileImage', imageDataUrl);
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -53,12 +85,23 @@ export default function FashionUploadForm() {
 
   // Remove inspiration image
   const removeInspirationImage = (index: number) => {
-    setInspirationImages((prev) => prev.filter((_, i) => i !== index));
+    setInspirationImages((prev) => {
+      const updatedImages = prev.filter((_, i) => i !== index);
+      // Update localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('userInspirationImages', JSON.stringify(updatedImages));
+      }
+      return updatedImages;
+    });
   };
 
   // Remove profile image
   const removeProfileImage = () => {
     setProfileImage("");
+    // Remove from localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('userProfileImage');
+    }
   };
 
   // Form submission handler
