@@ -103,26 +103,23 @@ export default function ResultsPage() {
       setIsSearching(true);
 
       try {
-        // Create an array of search queries from item descriptions
-        const searchQueries = recommendation.items.map(item => {
-          return `${item.description} ${recommendation.gender} gender`;
-        });
+        const itemsWithGender = recommendation.items.map(item => ({
+          ...item,
+          description: `${item.description} ${recommendation.gender}`
+        }));
+        const searchQueries = itemsWithGender.map(item => item.description);
         
-        // Use batch search to fetch all results at once
         const batchResults = await getBatchSearchResults(searchQueries);
-        
-        // Organize results by category
+
         const resultsByCategory: Record<string, SearchResult[]> = {};
         
-        recommendation.items.forEach((item, index) => {
-          // Get the results for this item's query
+        itemsWithGender.forEach(item => {
           const results = batchResults[item.description] || [];
           
           if (!resultsByCategory[item.category]) {
             resultsByCategory[item.category] = [];
           }
           
-          // Add category results
           if (results.length > 0) {
             resultsByCategory[item.category].push(...results);
           } else {
