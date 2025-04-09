@@ -307,43 +307,45 @@ export default function ResultsPage() {
               ) : (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {categoryResults[category]?.map((item: SearchResult, index: number) => (
-                    <div key={index} className="bg-white rounded-lg overflow-hidden shadow-sm relative group">
-                      <div className="aspect-w-1 aspect-h-1">
-                        <img
-                          src={item.thumbnailURL}
-                          alt={item.description}
-                          className="w-full h-full object-cover max-w-[180px] mx-auto"
-                          onError={(e) => {
-                            e.currentTarget.src = 'https://picsum.photos/400/400';
-                          }}
-                        />
-                        <a
-                          href={item.productURL}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="absolute top-4 right-4 p-2 bg-white rounded-full shadow-sm hover:bg-gray-100 transition-colors"
-                        >
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                            <polyline points="15 3 21 3 21 9" />
-                            <line x1="10" y1="14" x2="21" y2="3" />
-                          </svg>
-                        </a>
-                      </div>
-                      <div className="p-4">
-                        <p className="text-gray-600 mb-2">{item.description}</p>
-                        <div className="flex justify-between items-center">
-                          <span className="text-lg font-semibold">{item.price}</span>
-                          <a
-                            href={item.productURL}
-                            target="_blank"
-                            rel="noopener noreferrer" 
-                            className="text-gray-600 hover:text-gray-900 px-4 py-2 border rounded-md"
-                          >
-                            View Product
-                          </a>
+                    <div key={index} className="bg-white rounded-lg overflow-hidden shadow-sm relative group h-[320px] flex flex-col">
+                      <a
+                        href={item.productURL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex flex-col flex-grow"
+                      >
+                        <div className="h-[160px] flex-shrink-0 flex items-center justify-center">
+                          <img
+                            src={item.thumbnailURL}
+                            alt={item.description}
+                            className="w-full h-full object-contain max-w-[160px]"
+                            onError={(e) => {
+                              e.currentTarget.src = 'https://picsum.photos/400/400';
+                            }}
+                          />
                         </div>
-                      </div>
+                        <div className="p-3 flex flex-col flex-grow">
+                          <p className="text-gray-600 text-sm mb-2 line-clamp-2 hover:text-gray-900">{item.description}</p>
+                          <div className="flex justify-between items-center mt-auto">
+                            <span className="text-base font-semibold">{item.price}</span>
+                            <span className="text-gray-600 hover:text-gray-900 px-3 py-1.5 border rounded-md text-sm">
+                              View
+                            </span>
+                          </div>
+                        </div>
+                      </a>
+                      <a
+                        href={item.productURL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="absolute top-2 right-2 p-1.5 bg-white rounded-full shadow-sm hover:bg-gray-100 transition-colors"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                          <polyline points="15 3 21 3 21 9" />
+                          <line x1="10" y1="14" x2="21" y2="3" />
+                        </svg>
+                      </a>
                     </div>
                   ))}
                 </div>
