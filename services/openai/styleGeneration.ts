@@ -144,19 +144,48 @@ User preferences:
     if (startIdx >= 0 && endIdx > startIdx) {
       const jsonStr = responseText.substring(startIdx, endIdx);
       try {
-      const recommendations = JSON.parse(jsonStr);
+        const recommendations = JSON.parse(jsonStr);
 
-      if ("style" in recommendations && "items" in recommendations) {
-        if ("title" in recommendations.style && "description" in recommendations.style && "tags" in recommendations.style) {
-          console.log("Successfully retrieved style response from OpenAI");
-          return recommendations;
-        } else {
-          console.log("Invalid style format in response, here's the response: ", responseText);
+        if ("style" in recommendations && "items" in recommendations) {
+          if ("title" in recommendations.style && "description" in recommendations.style && "tags" in recommendations.style) {
+            console.log("Successfully retrieved style response from OpenAI");
+            return recommendations;
+          } else {
+            console.log("Invalid style format in response, here's the response: ", responseText);
+          }
+        }
+      } catch (e) {
+        console.log("Error parsing JSON in response, retrying request...");
+        
+        // Retry the request
+        const retryResponse = await openaiClient.chat.completions.create({
+          model: "gpt-4o-mini",
+          messages,
+          max_tokens: 800,
+          temperature: 0.7,
+          response_format: zodResponseFormat(styleResponseSchema, "style_response")
+        });
+        
+        const retryText = retryResponse.choices[0].message.content?.trim() || "";
+        const retryStartIdx = retryText.indexOf('{');
+        const retryEndIdx = retryText.lastIndexOf('}') + 1;
+        
+        if (retryStartIdx >= 0 && retryEndIdx > retryStartIdx) {
+          try {
+            const retryJsonStr = retryText.substring(retryStartIdx, retryEndIdx);
+            const retryRecommendations = JSON.parse(retryJsonStr);
+            
+            if ("style" in retryRecommendations && "items" in retryRecommendations) {
+              if ("title" in retryRecommendations.style && "description" in retryRecommendations.style && "tags" in retryRecommendations.style) {
+                console.log("Successfully retrieved style response from OpenAI on retry");
+                return retryRecommendations;
+              }
+            }
+          } catch (retryError) {
+            console.log("Error parsing JSON in retry response");
+          }
         }
       }
-    } catch (e) {
-      console.log("Error parsing JSON in response, here's the response: ", jsonStr);      
-    }
 
       // If we get here, the response wasn't in the correct format
       return {
