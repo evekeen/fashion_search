@@ -106,7 +106,51 @@ export default function FashionUploadForm() {
                 <h2 className="text-2xl font-bold mb-6 text-center">Find Your Perfect Style Match</h2>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                  <div>
+                  <div className="order-1 md:order-1">
+                    <h3 className="text-lg font-medium mb-3">Your Profile Picture</h3>
+                    <p className="text-gray-500 text-sm mb-4">
+                      Upload a photo of yourself to personalize your experience
+                    </p>
+                    
+                    <div className="flex justify-center mb-4">
+                      {profileImage ? (
+                        <div className="relative w-40 h-40">
+                          <Image 
+                            src={profileImage} 
+                            alt="Profile picture" 
+                            fill
+                            className="rounded-full object-cover"
+                          />
+                          <button
+                            type="button"
+                            onClick={removeProfileImage}
+                            className="absolute top-2 right-2 bg-black/70 text-white rounded-full p-1"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => profileInputRef.current?.click()}
+                          className="w-40 h-40 rounded-full border-2 border-dashed border-gray-300 flex flex-col items-center justify-center hover:border-gray-400 transition-colors"
+                        >
+                          <UserCircle2 className="h-12 w-12 text-gray-400 mb-2" />
+                          <span className="text-sm text-gray-500">Add Profile Picture</span>
+                        </button>
+                      )}
+                    </div>
+                    
+                    <Input
+                      ref={profileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleProfileUpload}
+                      className="hidden"
+                    />
+                  </div>
+                  
+                  <div className="order-2 md:order-2">
                     <h3 className="text-lg font-medium mb-3">Upload Inspiration</h3>
                     <p className="text-gray-500 text-sm mb-4">
                       Share images of styles you love or want to emulate
@@ -148,50 +192,6 @@ export default function FashionUploadForm() {
                       onChange={handleInspirationUpload}
                       className="hidden"
                       multiple
-                    />
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-lg font-medium mb-3">Your Profile Picture</h3>
-                    <p className="text-gray-500 text-sm mb-4">
-                      Upload a photo of yourself to personalize your experience
-                    </p>
-                    
-                    <div className="flex justify-center mb-4">
-                      {profileImage ? (
-                        <div className="relative w-40 h-40">
-                          <Image 
-                            src={profileImage} 
-                            alt="Profile picture" 
-                            fill
-                            className="rounded-full object-cover"
-                          />
-                          <button
-                            type="button"
-                            onClick={removeProfileImage}
-                            className="absolute top-2 right-2 bg-black/70 text-white rounded-full p-1"
-                          >
-                            <X size={16} />
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => profileInputRef.current?.click()}
-                          className="w-40 h-40 rounded-full border-2 border-dashed border-gray-300 flex flex-col items-center justify-center hover:border-gray-400 transition-colors"
-                        >
-                          <UserCircle2 className="h-12 w-12 text-gray-400 mb-2" />
-                          <span className="text-sm text-gray-500">Add Profile Picture</span>
-                        </button>
-                      )}
-                    </div>
-                    
-                    <Input
-                      ref={profileInputRef}
-                      type="file"
-                      accept="image/*"
-                      onChange={handleProfileUpload}
-                      className="hidden"
                     />
                   </div>
                 </div>
@@ -240,7 +240,7 @@ export default function FashionUploadForm() {
                 <div className="mb-8">
                   <h3 className="text-lg font-medium mb-3">Additional Information</h3>
                   <Textarea
-                    placeholder="Tell us more about your preferences (gender, specific event, style preferences, etc.)"
+                    placeholder="Tell us more about your preferences"
                     value={styleDescription}
                     onChange={(e) => setStyleDescription(e.target.value)}
                     className="min-h-[100px]"
