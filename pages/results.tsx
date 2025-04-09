@@ -1,5 +1,5 @@
 import { CLOTHING_CATEGORIES } from "@/categories";
-import { getSearchResults, getSearchResultsReal } from "@/services/searchService";
+import { getBatchSearchResults, getSearchResults, getSearchResultsReal } from "@/services/searchService";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Skeleton } from "../components/ui/skeleton";
@@ -102,26 +102,46 @@ export default function ResultsPage() {
 
       setIsSearching(true);
 
-      const results: SearchResultWithCategory[] = await Promise.all(
-        recommendation.items.map(async item => {
-          const r: SearchResponse = await getSearchResults(item.description);
-          return {
-            ...r.results[0],
-            category: item.category
+      try {
+        // Create an array of search queries from item descriptions
+        const searchQueries = recommendation.items.map(item => item.description);
+        
+        // Use batch search to fetch all results at once
+        const batchResults = await getBatchSearchResults(searchQueries);
+        
+        // Organize results by category
+        const resultsByCategory: Record<string, SearchResult[]> = {};
+        
+        recommendation.items.forEach((item, index) => {
+          // Get the results for this item's query
+          const results = batchResults[item.description] || [];
+          
+          if (!resultsByCategory[item.category]) {
+            resultsByCategory[item.category] = [];
           }
-        })
-      );
-
-      setCategoryResults(results.reduce((acc, curr) => {
-        acc[curr.category] = [...(acc[curr.category] || []), curr];
-        return acc;
-      }, {} as Record<string, SearchResultWithCategory[]>));
-
-      setIsSearching(false);
+          
+          // Add category results
+          if (results.length > 0) {
+            resultsByCategory[item.category].push(...results);
+          } else {
+            console.warn(`No results found for category ${item.category}, query: ${item.description}`);
+          }
+        });
+        
+        setCategoryResults(resultsByCategory);
+      } catch (error) {
+        console.error('Error fetching search results:', error);
+        setErrors(prev => ({ 
+          ...prev, 
+          search: error instanceof Error ? error.message : 'Failed to fetch search results' 
+        }));
+      } finally {
+        setIsSearching(false);
+      }
     };
 
     fetchSearchResults();
-  }, [recommendation, setCategoryResults, setIsSearching]);
+  }, [recommendation]);
   
   // Preload images for active category when data loads or active category changes
   useEffect(() => {
@@ -201,112 +221,137 @@ export default function ResultsPage() {
       </div>
 
       <h2 className="text-2xl font-bold mb-6">Recommended Items</h2>
-      <Tabs defaultValue={activeCategory} className="w-full">
-        <TabsList className="flex space-x-2 mb-8 border-b">
-          {categories.map((category) => (
-            <TabsTrigger
-              key={category}
-              value={category}
-              onClick={() => setActiveCategory(category)}
-              onMouseEnter={() => preloadCategoryImages(category)}
-              onFocus={() => preloadCategoryImages(category)}
-              className="px-4 py-2 text-gray-600 hover:text-gray-900"
-            >
-              {category}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+      {errors.search ? (
+        <div className="text-center py-12">
+          <div className="text-red-600 mb-4">
+            <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p className="text-lg">{errors.search}</p>
+          </div>
+          <button
+            onClick={() => {
+              setErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors.search;
+                return newErrors;
+              });
+              setCategoryResults({});
+              router.reload();
+            }}
+            className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      ) : (
+        <Tabs defaultValue={activeCategory} className="w-full">
+          <TabsList className="flex space-x-2 mb-8 border-b">
+            {categories.map((category) => (
+              <TabsTrigger
+                key={category}
+                value={category}
+                onClick={() => setActiveCategory(category)}
+                onMouseEnter={() => preloadCategoryImages(category)}
+                onFocus={() => preloadCategoryImages(category)}
+                className="px-4 py-2 text-gray-600 hover:text-gray-900"
+              >
+                {category}
+              </TabsTrigger>
+            ))}
+          </TabsList>
 
-        {categories.map((category) => (
-          <TabsContent key={category} value={category} className="data-[state=inactive]:hidden">
-            {isSearching && category === activeCategory ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <div key={i} className="bg-white rounded-lg overflow-hidden shadow-sm">
-                    <Skeleton className="aspect-w-1 aspect-h-1 w-full" />
-                    <div className="p-4">
-                      <Skeleton className="h-4 w-3/4 mb-2" />
-                      <div className="flex justify-between items-center">
-                        <Skeleton className="h-6 w-20" />
-                        <Skeleton className="h-10 w-28" />
+          {categories.map((category) => (
+            <TabsContent key={category} value={category} className="data-[state=inactive]:hidden">
+              {isSearching && category === activeCategory ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <div key={i} className="bg-white rounded-lg overflow-hidden shadow-sm">
+                      <Skeleton className="aspect-w-1 aspect-h-1 w-full" />
+                      <div className="p-4">
+                        <Skeleton className="h-4 w-3/4 mb-2" />
+                        <div className="flex justify-between items-center">
+                          <Skeleton className="h-6 w-20" />
+                          <Skeleton className="h-10 w-28" />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            ) : errors[category] ? (
-              <div className="text-center py-12">
-                <div className="text-red-600 mb-4">
-                  <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <p className="text-lg">{errors[category]}</p>
+                  ))}
                 </div>
-                <button
-                  onClick={() => {
-                    setErrors(prev => {
-                      const newErrors = { ...prev };
-                      delete newErrors[category];
-                      return newErrors;
-                    });
-                    setCategoryResults(prev => {
-                      const newResults = { ...prev };
-                      delete newResults[category];
-                      return newResults;
-                    });
-                  }}
-                  className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800 transition-colors"
-                >
-                  Retry
-                </button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {categoryResults[category]?.map((item: SearchResult, index: number) => (
-                  <div key={index} className="bg-white rounded-lg overflow-hidden shadow-sm relative group">
-                    <div className="aspect-w-1 aspect-h-1">
-                      <img
-                        src={item.thumbnailURL}
-                        alt={item.description}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.src = 'https://picsum.photos/400/400';
-                        }}
-                      />
-                      <a
-                        href={item.productURL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="absolute top-4 right-4 p-2 bg-white rounded-full shadow-sm hover:bg-gray-100 transition-colors"
-                      >
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                          <polyline points="15 3 21 3 21 9" />
-                          <line x1="10" y1="14" x2="21" y2="3" />
-                        </svg>
-                      </a>
-                    </div>
-                    <div className="p-4">
-                      <p className="text-gray-600 mb-2">{item.description}</p>
-                      <div className="flex justify-between items-center">
-                        <span className="text-lg font-semibold">{item.price}</span>
+              ) : errors[category] ? (
+                <div className="text-center py-12">
+                  <div className="text-red-600 mb-4">
+                    <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p className="text-lg">{errors[category]}</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setErrors(prev => {
+                        const newErrors = { ...prev };
+                        delete newErrors[category];
+                        return newErrors;
+                      });
+                      setCategoryResults(prev => {
+                        const newResults = { ...prev };
+                        delete newResults[category];
+                        return newResults;
+                      });
+                    }}
+                    className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800 transition-colors"
+                  >
+                    Retry
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {categoryResults[category]?.map((item: SearchResult, index: number) => (
+                    <div key={index} className="bg-white rounded-lg overflow-hidden shadow-sm relative group">
+                      <div className="aspect-w-1 aspect-h-1">
+                        <img
+                          src={item.thumbnailURL}
+                          alt={item.description}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = 'https://picsum.photos/400/400';
+                          }}
+                        />
                         <a
                           href={item.productURL}
                           target="_blank"
-                          rel="noopener noreferrer" 
-                          className="text-gray-600 hover:text-gray-900 px-4 py-2 border rounded-md"
+                          rel="noopener noreferrer"
+                          className="absolute top-4 right-4 p-2 bg-white rounded-full shadow-sm hover:bg-gray-100 transition-colors"
                         >
-                          View Product
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                            <polyline points="15 3 21 3 21 9" />
+                            <line x1="10" y1="14" x2="21" y2="3" />
+                          </svg>
                         </a>
                       </div>
+                      <div className="p-4">
+                        <p className="text-gray-600 mb-2">{item.description}</p>
+                        <div className="flex justify-between items-center">
+                          <span className="text-lg font-semibold">{item.price}</span>
+                          <a
+                            href={item.productURL}
+                            target="_blank"
+                            rel="noopener noreferrer" 
+                            className="text-gray-600 hover:text-gray-900 px-4 py-2 border rounded-md"
+                          >
+                            View Product
+                          </a>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </TabsContent>
-        ))}
-      </Tabs>
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+          ))}
+        </Tabs>
+      )}
     </div>
   );
-} 
+}

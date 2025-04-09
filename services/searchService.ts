@@ -44,3 +44,20 @@ export async function getSearchResultsReal(query: string): Promise<SearchRespons
 
     return await response.json();
 }
+
+export async function getBatchSearchResults(queries: string[]): Promise<Record<string, SearchResult[]>> {
+    const response = await fetch('/api/search', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ queries }),
+    });
+
+    if (!response.ok) {
+        throw new Error(`Batch search request failed: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.results;
+}
