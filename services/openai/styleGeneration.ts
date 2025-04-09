@@ -151,7 +151,7 @@ User preferences:
           console.log("Successfully retrieved style response from OpenAI");
           return recommendations;
         } else {
-          console.log("Invalid style format in response, here's the response: ", jsonStr);
+          console.log("Invalid style format in response, here's the response: ", responseText);
         }
       }
     } catch (e) {

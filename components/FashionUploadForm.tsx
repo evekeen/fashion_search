@@ -138,10 +138,10 @@ export default function FashionUploadForm() {
   return (
     <section id="fashion-upload" className="py-16 bg-white">
       <div className="container mx-auto px-4">
-        <Card className="max-w-4xl mx-auto shadow-lg border-0 overflow-hidden">
-          <CardContent className="p-0">
+        <div className="max-w-4xl mx-auto overflow-hidden">
+          <div className="p-0">
             {isLoading ? (
-              <div className="p-16">
+              <div className="p-16 bg-transparent">
                 <LoadingAnimation />
               </div>
             ) : (
@@ -320,8 +320,8 @@ export default function FashionUploadForm() {
                 </Button>
               </form>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </section>
   );

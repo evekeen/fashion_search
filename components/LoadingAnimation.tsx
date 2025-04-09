@@ -47,7 +47,7 @@ export default function LoadingAnimation() {
           <Sparkles className="w-8 h-8 text-black animate-pulse" />
         </div>
       </div>
-      <div className="text-center">
+      <div className="text-center h-16">
         <p className="text-lg font-medium text-gray-700">{currentMessage.title}</p>
         <p className="text-sm text-gray-500">{currentMessage.subtitle}</p>
       </div>
