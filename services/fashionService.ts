@@ -37,6 +37,7 @@ export const getFashionRecommendationsReal = async (
     budget: string,
     additionalInfo: string
   ): Promise<StyleResponse> => {
+    console.log('Submitting form data');
     const formData = new FormData();
   
     inspirationImages.forEach((image, index) => {
