@@ -45,39 +45,93 @@ export default function FashionUploadForm() {
   const inspirationInputRef = useRef<HTMLInputElement>(null);
   const profileInputRef = useRef<HTMLInputElement>(null);
 
+  // Compress image function
+  const compressImage = (file: File, maxWidth: number = 512, quality: number = 0.7): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new window.Image();
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          
+          // Calculate new dimensions while maintaining aspect ratio
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            reject(new Error('Could not get canvas context'));
+            return;
+          }
+          
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          // Convert to compressed JPEG
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+          resolve(compressedDataUrl);
+        };
+        img.onerror = () => {
+          reject(new Error('Error loading image'));
+        };
+      };
+      reader.onerror = () => {
+        reject(new Error('Error reading file'));
+      };
+    });
+  };
+
   // Handle inspiration image upload
-  const handleInspirationUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInspirationUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
-      Array.from(files).forEach(file => {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          if (event.target?.result) {
-            setInspirationImages(prev => [...prev, event.target?.result as string]);
-            if (typeof window !== 'undefined') {
-              localStorage.setItem('userInspirationImages', JSON.stringify([...inspirationImages, event.target?.result as string]));
-            }
+      setIsLoading(true);
+      try {
+        const compressedImages = await Promise.all(
+          Array.from(files).map(file => compressImage(file))
+        );
+        
+        setInspirationImages(prev => {
+          const newImages = [...prev, ...compressedImages];
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('userInspirationImages', JSON.stringify(newImages));
           }
-        };
-        reader.readAsDataURL(file);
-      });
+          return newImages;
+        });
+      } catch (err) {
+        console.error('Error compressing images:', err);
+        setError('Failed to process images. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
   // Handle profile image upload
-  const handleProfileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProfileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (event.target?.result) {
-          setProfileImage(event.target.result as string);
-          if (typeof window !== 'undefined') {
-            localStorage.setItem('userProfileImage', event.target.result as string);
-          }
+      setIsLoading(true);
+      try {
+        const compressedImage = await compressImage(file);
+        setProfileImage(compressedImage);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('userProfileImage', compressedImage);
         }
-      };
-      reader.readAsDataURL(file);
+      } catch (err) {
+        console.error('Error compressing profile image:', err);
+        setError('Failed to process profile image. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
