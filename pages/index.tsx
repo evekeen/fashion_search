@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import SiteLogo from "../components/SiteLogo";
 import { Button } from "../components/ui/button";
+import SignatureStyle from "@/components/SignatureStyle";
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -154,6 +155,8 @@ export default function Home() {
         </div>
       </section>
 
+      <SignatureStyle />
+
       <footer className="border-t border-gray-200 py-12 mt-20 bg-black text-white">
         <div className="container mx-auto px-4 text-center">
           <div className="mb-6 flex justify-center">
@@ -164,7 +167,7 @@ export default function Home() {
               About
             </a>
           </div>
-          <p className="text-gray-500"> 2023 Fashion Search. All rights reserved.</p>
+          <p className="text-gray-500"> 2025 Fashion Search. All rights reserved.</p>
         </div>
       </footer>
     </div>
