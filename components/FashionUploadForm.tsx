@@ -1,4 +1,4 @@
-import { Sparkles, Upload, UserCircle2, X } from "lucide-react";
+import { RefreshCw, Sparkles, Upload, UserCircle2, X } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/router";
@@ -19,6 +19,7 @@ export default function FashionUploadForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [validationError, setValidationError] = useState("");
+  const [styleSuggestions, setStyleSuggestions] = useState<string[]>([]);
 
   // Load saved images from localStorage on initial render
   useEffect(() => {
@@ -134,6 +135,17 @@ export default function FashionUploadForm() {
       return true; // Default to allowing searches if there's an error
     }
   };
+
+  // Generate random style suggestions
+  const generateStyleSuggestions = () => {
+    const shuffled = [...descriptionTemplates].sort(() => 0.5 - Math.random());
+    setStyleSuggestions(shuffled.slice(0, 3));
+  };
+
+  // Initialize style suggestions on component mount
+  useEffect(() => {
+    generateStyleSuggestions();
+  }, []);
 
   // Form submission handler
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -283,15 +295,39 @@ export default function FashionUploadForm() {
                   </div>
                 </div>
                 
-                {/* Additional Information */}
                 <div className="mb-8">
-                  <h3 className="text-lg font-medium mb-3">Additional Information</h3>
+                  <h3 className="text-lg font-medium mb-3">Description <span className="text-gray-400 text-sm font-normal">(optional)</span></h3>
                   <Textarea
                     placeholder="Tell us more about your preferences"
                     value={styleDescription}
                     onChange={(e) => setStyleDescription(e.target.value)}
-                    className="min-h-[100px]"
+                    className="min-h-[100px] mb-3"
                   />
+                  
+                  <div className="flex items-start gap-4 mb-2">
+                    <div className="flex-1 space-y-3">
+                      {styleSuggestions.map((suggestion, index) => (
+                        <div 
+                          key={index} 
+                          className="p-4 border rounded-xl cursor-pointer hover:bg-gray-50 transition-colors bg-gray-50/50 shadow-sm"
+                          onClick={() => setStyleDescription(suggestion)}
+                        >
+                          <p className="text-sm">{suggestion}</p>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={generateStyleSuggestions}
+                      className="rounded-full self-start"
+                      title="Generate new suggestions"
+                    >
+                      <RefreshCw className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
                 
                 {validationError && (
@@ -330,3 +366,36 @@ export default function FashionUploadForm() {
     </section>
   );
 }
+
+const descriptionTemplates = [
+    "Bohemian Luxe: Vibrant, layered textures with embroidered details and flowing silhouettes that evoke free-spirited summer festivals.",
+    "Vintage Glamour: Sophisticated ensembles paired with classic accessories and a touch of old Hollywood charm for a timeless look.",
+    "Modern Minimalist: Clean lines, monochrome palettes, and streamlined silhouettes that embody contemporary urban sophistication.",
+    "Edgy Street Warrior: Bold distressed denim, graphic tees, and statement accessories that radiate rebellious energy.",
+    "Renaissance Revival: Ornate fabrics, rich hues, and intricate embellishments inspired by historical opulence with a modern twist.",
+    "Athleisure Luxe: Sporty silhouettes combined with premium materials and subtle embellishments for a stylishly active look.",
+    "Futuristic Cyberpunk: Urban cuts paired with metallic accents, innovative silhouettes, and neon hints evoking high-tech energy.",
+    "Romantic Pastel Dream: Soft, airy fabrics in gentle hues adorned with delicate prints for an ethereal, feminine appeal.",
+    "Eco-Chic Urban Explorer: Sustainable fabrics, functional designs, and an effortless blend of rugged and refined elements.",
+    "Classic Power Suit: Tailored fits, sharp lines, and bold accessories designed to command attention in any boardroom.",
+    "Artistic Avant-Garde: Unconventional silhouettes, experimental patterns, and a fusion of textures that push style boundaries.",
+    "Summer Resort Elegance: Breezy, colorful ensembles crafted from lightweight fabrics perfect for sunlit days and starlit nights.",
+    "Gothic Boho: Dark yet dreamy layers, intricate lace details, and statement accessories that blend mysticism with modern edge.",
+    "Urban Nomad: Utilitarian details with rugged fabrics and versatile, layered pieces ideal for city adventures and travel.",
+    "Retro-Futuristic Mod: Sharp silhouettes with vibrant colors, geometric prints, and nostalgic nods to '60s style reimagined.",
+    "Eclectic Festival Fusion: Bold patterns, dynamic layering, and unexpected embellishments capturing the spirit of creative rebellion.",
+    "Elegant Evening Soirée: Opulent fabrics, shimmering accents, and sophisticated tailoring that turns every entrance into a statement.",
+    "Rustic Countryside Charm: Earthy tones, timeless textures, and a mix of vintage prints with modern comfort for relaxed elegance.",
+    "High-Fashion Couture: Exquisitely tailored ensembles featuring dramatic silhouettes, intricate embroidery, and luxurious fabrics.",
+    "Casual Decadence: Relaxed fits elevated by meticulous styling and premium details for an upscale, everyday look.",
+    "Medieval Revival: Dramatic draped fabrics, statement belts, and regal textures that echo the grandeur of ancient courts.",
+    "Enchanted Evening: Ethereal gowns paired with delicate accessories and subtle hints of sparkle for a mystical, fairy-tale ambiance.",
+    "Urban Jungle: Bold nature-inspired prints and rugged textures combined with refined cuts to create a wild city vibe.",
+    "Sophisticated Boho-Chic: A mix of relaxed silhouettes with tailored detailing and artisanal accessories that tell a story.",
+    "Metropolitan Edge: Sleek, structured pieces with unexpected details blending urban sophistication and modern rebellion.",
+    "Vintage Street Sophisticate: A tasteful mix of retro prints and contemporary tailoring that radiates nostalgic urban flair.",
+    "Glamorous Rock 'n' Roll: Leather accents, metallic details, and daring cuts that capture the spirit of rebellious elegance.",
+    "Effortless Coastal Living: Breezy fabrics, sun-drenched hues, and relaxed silhouettes that embody seaside sophistication.",
+    "Artisanal Modern: Handcrafted details, layered textures, and contemporary silhouettes that celebrate creative individuality.",
+    "Opulent Journey: A fusion of global influences with lavish fabrics, intricate patterns, and an air of refined wanderlust."
+]
