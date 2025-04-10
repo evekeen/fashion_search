@@ -40,7 +40,8 @@ export default function Dashboard() {
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <SiteLogo size="medium" />
           <div className="flex items-center gap-4">
-            <div className="hidden md:flex items-center gap-2">
+            <SearchCount />
+            <div className="flex items-center gap-2">
               <img 
                 src={session.user?.image || "/images/default-avatar.png"} 
                 alt={session.user?.name || "User"} 
@@ -59,10 +60,6 @@ export default function Dashboard() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Your Fashion Dashboard</h1>
-          <SearchCount />
-        </div>
         <FashionUploadForm />
       </main>
     </div>
