@@ -18,6 +18,9 @@ export default NextAuth({
       return true;
     },
     async redirect({ url, baseUrl }) {
+      if (url.startsWith("/")) {
+        return `${baseUrl}${url}`;
+      }
       return url.startsWith(baseUrl) ? url : baseUrl;
     },
     async session({ session, token }) {

@@ -3,7 +3,6 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { FcGoogle } from "react-icons/fc";
-import SiteLogo from "../../components/SiteLogo";
 import { Button } from "../../components/ui/button";
 
 export default function SignIn() {
@@ -18,7 +17,10 @@ export default function SignIn() {
   }, [status, router, callbackUrl]);
 
   const handleGoogleSignIn = () => {
-    signIn("google", { callbackUrl: callbackUrl as string || "/dashboard" });
+    signIn("google", { 
+      callbackUrl: callbackUrl as string || "/dashboard",
+      redirect: true
+    });
   };
 
   return (
