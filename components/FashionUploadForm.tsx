@@ -26,6 +26,7 @@ export default function FashionUploadForm() {
     if (typeof window !== 'undefined') {
       const savedProfileImage = localStorage.getItem('userProfileImage');
       const savedInspirationImages = localStorage.getItem('userInspirationImages');
+      const savedStyleDescription = localStorage.getItem('userStyleDescription');
       
       if (savedProfileImage) {
         setProfileImage(savedProfileImage);
@@ -37,6 +38,10 @@ export default function FashionUploadForm() {
         } catch (e) {
           console.error('Error parsing saved inspiration images:', e);
         }
+      }
+      
+      if (savedStyleDescription) {
+        setStyleDescription(savedStyleDescription);
       }
     }
   }, []);
@@ -201,6 +206,21 @@ export default function FashionUploadForm() {
     generateStyleSuggestions();
   }, []);
 
+  const handleStyleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newDescription = e.target.value;
+    setStyleDescription(newDescription);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('userStyleDescription', newDescription);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion: string) => {
+    setStyleDescription(suggestion);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('userStyleDescription', suggestion);
+    }
+  };
+
   // Form submission handler
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -354,7 +374,7 @@ export default function FashionUploadForm() {
                   <Textarea
                     placeholder="Tell us more about your preferences"
                     value={styleDescription}
-                    onChange={(e) => setStyleDescription(e.target.value)}
+                    onChange={handleStyleDescriptionChange}
                     className="min-h-[100px] mb-3"
                   />
                   
@@ -364,7 +384,7 @@ export default function FashionUploadForm() {
                         <div 
                           key={index} 
                           className="p-4 border rounded-xl cursor-pointer hover:bg-gray-50 transition-colors bg-gray-50/50 shadow-sm"
-                          onClick={() => setStyleDescription(suggestion)}
+                          onClick={() => handleSuggestionClick(suggestion)}
                         >
                           <p className="text-sm">{suggestion}</p>
                         </div>
