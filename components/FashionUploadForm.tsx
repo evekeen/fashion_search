@@ -1,4 +1,5 @@
 import { Sparkles, Upload, UserCircle2, X } from "lucide-react";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import React, { useEffect, useRef, useState } from "react";
@@ -10,6 +11,7 @@ import LoadingAnimation from "./LoadingAnimation";
 
 export default function FashionUploadForm() {
   const router = useRouter();
+  const { data: session } = useSession();
   // State for form inputs
   const [inspirationImages, setInspirationImages] = useState<string[]>([]);
   const [profileImage, setProfileImage] = useState<string>("");
@@ -48,15 +50,13 @@ export default function FashionUploadForm() {
     if (files && files.length > 0) {
       Array.from(files).forEach(file => {
         const reader = new FileReader();
-        reader.onload = (e) => {
-          setInspirationImages((prev) => {
-            const updatedImages = [...prev, e.target?.result as string];
-            // Save to localStorage
+        reader.onload = (event) => {
+          if (event.target?.result) {
+            setInspirationImages(prev => [...prev, event.target?.result as string]);
             if (typeof window !== 'undefined') {
-              localStorage.setItem('userInspirationImages', JSON.stringify(updatedImages));
+              localStorage.setItem('userInspirationImages', JSON.stringify([...inspirationImages, event.target?.result as string]));
             }
-            return updatedImages;
-          });
+          }
         };
         reader.readAsDataURL(file);
       });
@@ -65,16 +65,15 @@ export default function FashionUploadForm() {
 
   // Handle profile image upload
   const handleProfileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      const file = files[0];
+    const file = e.target.files?.[0];
+    if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => {
-        const imageDataUrl = e.target?.result as string;
-        setProfileImage(imageDataUrl);
-        // Save to localStorage
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('userProfileImage', imageDataUrl);
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          setProfileImage(event.target.result as string);
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('userProfileImage', event.target.result as string);
+          }
         }
       };
       reader.readAsDataURL(file);
@@ -83,22 +82,56 @@ export default function FashionUploadForm() {
 
   // Remove inspiration image
   const removeInspirationImage = (index: number) => {
-    setInspirationImages((prev) => {
-      const updatedImages = prev.filter((_, i) => i !== index);
-      // Update localStorage
+    setInspirationImages(prev => {
+      const newImages = [...prev];
+      newImages.splice(index, 1);
       if (typeof window !== 'undefined') {
-        localStorage.setItem('userInspirationImages', JSON.stringify(updatedImages));
+        localStorage.setItem('userInspirationImages', JSON.stringify(newImages));
       }
-      return updatedImages;
+      return newImages;
     });
   };
 
   // Remove profile image
   const removeProfileImage = () => {
     setProfileImage("");
-    // Remove from localStorage
     if (typeof window !== 'undefined') {
       localStorage.removeItem('userProfileImage');
+    }
+  };
+
+  // Track search in the backend
+  const trackSearch = async (results: any) => {
+    try {
+      await fetch('/api/search/track', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          timestamp: new Date().toISOString(),
+          query: {
+            inspirationImages: inspirationImages.length,
+            profileImage: !!profileImage,
+            styleDescription
+          },
+          results
+        }),
+      });
+    } catch (error) {
+      console.error('Error tracking search:', error);
+    }
+  };
+
+  // Check if the user can perform a search
+  const checkSearchLimit = async (): Promise<boolean> => {
+    try {
+      const response = await fetch('/api/search/limit');
+      const data = await response.json();
+      return data.canSearch;
+    } catch (error) {
+      console.error('Error checking search limit:', error);
+      return true; // Default to allowing searches if there's an error
     }
   };
 
@@ -120,8 +153,21 @@ export default function FashionUploadForm() {
 
     setIsLoading(true);
 
-    try {            
-      const response = await getFashionRecommendationsReal(inspirationImages, profileImage, "Medium", styleDescription);      
+    try {
+      // Check if the user can perform a search
+      const canSearch = await checkSearchLimit();
+      
+      if (!canSearch) {
+        setError("You have reached your daily search limit. Please try again tomorrow.");
+        setIsLoading(false);
+        return;
+      }
+      
+      const response = await getFashionRecommendationsReal(inspirationImages, profileImage, "Medium", styleDescription);
+      
+      // Track the search with the results
+      await trackSearch(response);
+      
       const encodedResults = encodeURIComponent(JSON.stringify(response));
       router.push(`/results?results=${encodedResults}`);
     } catch (err: any) {

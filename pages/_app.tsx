@@ -1,12 +1,13 @@
-import '../styles/globals.css';
+import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { SessionProvider } from "next-auth/react";
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
-import { SpeedInsights } from "@vercel/speed-insights/next"
-import { Analytics } from '@vercel/analytics/next';
+import '../styles/globals.css';
 
-function MyApp({ Component, pageProps }: AppProps) {
+function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
   return (
-    <>
+    <SessionProvider session={session}>
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -16,7 +17,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <Component {...pageProps} />
       <SpeedInsights />
       <Analytics />
-    </>
+    </SessionProvider>
   );
 }
 

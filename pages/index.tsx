@@ -1,12 +1,23 @@
-import React, { useState } from "react";
-import Head from "next/head";
-import FashionUploadForm from "../components/FashionUploadForm";
-import SiteLogo from "../components/SiteLogo";
-import FashionBackground from "../components/FashionBackground";
 import { ArrowDown } from "lucide-react";
+import { useSession } from "next-auth/react";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import FashionBackground from "../components/FashionBackground";
+import SiteLogo from "../components/SiteLogo";
 import { Button } from "../components/ui/button";
 
 export default function Home() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  const handleGetStarted = () => {
+    if (status === "authenticated") {
+      router.push("/dashboard");
+    } else {
+      router.push("/auth/signin?callbackUrl=/dashboard");
+    }
+  };
+
   return (
     <div className="min-h-screen relative">
       <Head>
@@ -30,18 +41,12 @@ export default function Home() {
         <Button
           className="rounded-full px-8 py-6 text-lg bg-black hover:bg-black/90 text-white border-0"
           size="lg"
-          onClick={() => {
-            document.getElementById("fashion-upload")?.scrollIntoView({ behavior: "smooth" })
-          }}
+          onClick={handleGetStarted}
         >
           Get Started <ArrowDown className="ml-2 h-5 w-4" />
         </Button>
       </section>
 
-      {/* Fashion Upload Form */}
-      <div id="fashion-upload">
-        <FashionUploadForm />
-      </div>
       {/* Footer */}
       <footer className="border-t border-gray-200 py-12 mt-20 bg-black text-white">
         <div className="container mx-auto px-4 text-center">

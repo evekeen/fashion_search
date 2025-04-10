@@ -1,5 +1,6 @@
 import { CLOTHING_CATEGORIES } from "@/categories";
 import { getBatchSearchResults } from "@/services/searchService";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Skeleton } from "../components/ui/skeleton";
@@ -18,6 +19,7 @@ interface SearchResultWithCategory extends SearchResult {
 
 export default function ResultsPage() {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [recommendation, setRecommendation] = useState<StyleResponse | null>(null);
   const [activeCategory, setActiveCategory] = useState<string>("Tops");
   const [categoryResults, setCategoryResults] = useState<Record<string, SearchResult[]>>({});
@@ -35,6 +37,12 @@ export default function ResultsPage() {
     ),
     [recommendation?.items]
   );
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/auth/signin?callbackUrl=" + encodeURIComponent(router.asPath));
+    }
+  }, [status, router]);
 
   useEffect(() => {
     if (!recommendation) return;
@@ -149,6 +157,18 @@ export default function ResultsPage() {
     }
   }, [activeCategory, categoryResults, isSearching, preloadCategoryImages]);  
 
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return null;
+  }
+
   if (!recommendation || errors.parsing) {
     return (
       <div className="container mx-auto px-4 py-16">
@@ -160,7 +180,7 @@ export default function ResultsPage() {
             <p className="text-lg">{errors.parsing || "No results found"}</p>
           </div>
           <button
-            onClick={() => router.push('/')}
+            onClick={() => router.push('/dashboard')}
             className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800 transition-colors"
           >
             Try Again
@@ -176,13 +196,13 @@ export default function ResultsPage() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
           <h1 className="text-3xl sm:text-4xl font-bold">Your Personalized Results</h1>
           <button
-            onClick={() => router.push('/')}
+            onClick={() => router.push('/dashboard')}
             className="flex items-center bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition-colors w-full sm:w-auto justify-center sm:justify-start"
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            Back to Home
+            Back to Dashboard
           </button>
         </div>
         <p className="text-lg sm:text-xl text-gray-600 mb-12">Based on your style preferences, we've curated these recommendations just for you.</p>

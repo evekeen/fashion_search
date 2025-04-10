@@ -80,6 +80,46 @@ A personalized fashion recommendation platform that allows users to upload image
 6. Results are displayed in a category-based tab interface
 7. Users can view product details and visit product pages
 
+## Authentication Setup
+
+This application uses NextAuth.js (Auth.js) for authentication with Google as the only provider. To set up authentication:
+
+1. Create a Google OAuth application:
+   - Go to the [Google Cloud Console](https://console.cloud.google.com/)
+   - Create a new project or select an existing one
+   - Navigate to "APIs & Services" > "Credentials"
+   - Click "Create Credentials" > "OAuth client ID"
+   - Select "Web application" as the application type
+   - Add authorized redirect URIs:
+     - `http://localhost:3000/api/auth/callback/google` (for development)
+     - `https://your-production-domain.com/api/auth/callback/google` (for production)
+   - Copy the Client ID and Client Secret
+
+2. Update your `.env` file with the Google OAuth credentials:
+   ```
+   NEXTAUTH_URL=http://localhost:3000
+   NEXTAUTH_SECRET=your-nextauth-secret-key-change-this-in-production
+   GOOGLE_CLIENT_ID=your-google-client-id
+   GOOGLE_CLIENT_SECRET=your-google-client-secret
+   ```
+
+3. Generate a secure NEXTAUTH_SECRET:
+   - You can use the following command to generate a secure secret:
+     ```
+     openssl rand -base64 32
+     ```
+
+4. Restart your development server after updating the environment variables.
+
+## Protected Routes
+
+The following routes require authentication:
+- `/dashboard` - User dashboard
+- `/results` - Search results page
+- All API routes under `/api/*`
+
+Users must sign in with Google to access these routes.
+
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
