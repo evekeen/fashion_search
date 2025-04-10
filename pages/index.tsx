@@ -88,6 +88,72 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="container mx-auto px-4 py-24">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-bold mb-4">How It Works</h2>
+          <p className="text-gray-600 text-lg">
+            Our advanced AI helps you discover new styles and find the perfect outfits based on your preferences.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="flex flex-col items-center text-center">
+            <div className="w-16 h-16 mb-6 flex items-center justify-center">
+              <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold mb-3">Upload Your Style</h3>
+            <p className="text-gray-600">
+              Upload photos of your favorite outfits or items you love to get personalized style recommendations.
+            </p>
+          </div>
+
+          <div className="flex flex-col items-center text-center relative">
+            <div className="w-16 h-16 mb-6 flex items-center justify-center">
+              <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="M21 21l-4.35-4.35"/>
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold mb-3">Visual Search</h3>
+            <p className="text-gray-600">
+              Find similar items or complete looks based on images from social media, magazines, or your camera roll.
+            </p>
+          </div>
+
+          <div className="flex flex-col items-center text-center">
+            <div className="w-16 h-16 mb-6 flex items-center justify-center">
+              <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 3L14 9L20 10L15.5 14L17 20L12 17L7 20L8.5 14L4 10L10 9L12 3Z"/>
+                <path d="M5 16L3 18"/>
+                <path d="M19 16L21 18"/>
+                <path d="M12 20L12 23"/>
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold mb-3">AI Recommendations</h3>
+            <p className="text-gray-600">
+              Experience cutting-edge AI algorithms that understand your style preferences and suggest perfect matches.
+            </p>
+          </div>
+
+          <div className="flex flex-col items-center text-center">
+            <div className="w-16 h-16 mb-6 flex items-center justify-center">
+              <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+                <path d="M3 6h18"/>
+                <path d="M16 10a4 4 0 01-8 0"/>
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold mb-3">Shop Complete Looks</h3>
+            <p className="text-gray-600">
+              Discover and purchase complete outfits curated by our AI from top fashion brands and retailers.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <footer className="border-t border-gray-200 py-12 mt-20 bg-black text-white">
         <div className="container mx-auto px-4 text-center">
           <div className="mb-6 flex justify-center">
