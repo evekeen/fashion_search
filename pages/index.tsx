@@ -15,13 +15,6 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <button onClick={() => {
-        fetch('/api/hello')
-          .then(response => response.json())
-          .then(data => console.log(data))
-          .catch(error => console.error('Error:', error));
-      }}>Click me</button>
-
       <FashionBackground />
 
       {/* Hero Section */}
