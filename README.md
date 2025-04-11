@@ -150,26 +150,3 @@ Users must sign in with Google to access these routes.
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Setting up Vercel KV (Redis)
-
-This application uses Vercel KV (Redis) to track user searches and implement search limits. To set up Vercel KV:
-
-1. Install Vercel KV in your project:
-   ```bash
-   vercel kv add
-   ```
-
-2. Follow the prompts to create a new KV database.
-
-3. Vercel will automatically add the necessary environment variables to your project:
-   - `KV_URL`
-   - `KV_REST_API_URL`
-   - `KV_REST_API_TOKEN`
-   - `KV_REST_API_READ_ONLY_TOKEN`
-
-4. For local development, create a `.env.local` file with the same environment variables.
-
-## Search Limits
-
-The application limits users to 5 searches per day. This is implemented using Vercel KV to track search counts.
