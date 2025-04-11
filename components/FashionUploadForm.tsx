@@ -160,10 +160,10 @@ export default function FashionUploadForm() {
     }
   };
 
-  // Track search in the backend
-  const trackSearch = async (results: any) => {
+  const trackSearch = async () => {
     try {
-      await fetch('/api/search/track', {
+      console.log('Tracking search');
+      const response = await fetch('/api/search/track', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -174,19 +174,40 @@ export default function FashionUploadForm() {
             inspirationImages: inspirationImages.length,
             profileImage: !!profileImage,
             styleDescription
-          },
-          results
+          }
         }),
+        credentials: 'include', // Ensure cookies are sent with the request
       });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Error tracking search:', errorData);
+        
+        if (response.status === 401) {
+          console.warn('Authentication error when tracking search, continuing with search anyway');
+          return;
+        }
+      } else {
+        console.log('Search tracked successfully');
+      }
     } catch (error) {
       console.error('Error tracking search:', error);
     }
+    window.dispatchEvent(new Event('searchCounterRefresh'));
   };
 
   // Check if the user can perform a search
   const checkSearchLimit = async (): Promise<boolean> => {
     try {
-      const response = await fetch('/api/search/limit');
+      const response = await fetch('/api/search/limit', {
+        credentials: 'include', // Ensure cookies are sent with the request
+      });
+      
+      if (response.status === 401) {
+        console.warn('Authentication error when checking search limit, defaulting to allowing search');
+        return true;
+      }
+      
       const data = await response.json();
       return data.canSearch;
     } catch (error) {
@@ -248,11 +269,9 @@ export default function FashionUploadForm() {
         setIsLoading(false);
         return;
       }
+      await trackSearch();
       
       const response = await getFashionRecommendationsReal(inspirationImages, profileImage, "Medium", styleDescription);
-      
-      // Track the search with the results
-      await trackSearch(response);
       
       const encodedResults = encodeURIComponent(JSON.stringify(response));
       router.push(`/results?results=${encodedResults}`);

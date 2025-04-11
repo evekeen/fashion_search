@@ -11,6 +11,8 @@ A personalized fashion recommendation platform that allows users to upload image
 - Responsive user interface
 - Category-based product search results
 - Visual style generation with AI
+- Search tracking and rate limiting
+- Redis-based data persistence
 
 ## Tech Stack
 
@@ -18,6 +20,8 @@ A personalized fashion recommendation platform that allows users to upload image
 - **Styling**: Tailwind CSS
 - **AI Integration**: OpenAI's ChatGPT API, Hugging Face
 - **Search Integration**: SerpApi, SearchAPI.io
+- **Data Storage**: Redis
+- **Authentication**: NextAuth.js (Auth.js)
 
 ## Getting Started
 
@@ -27,6 +31,7 @@ A personalized fashion recommendation platform that allows users to upload image
 - OpenAI API key
 - SerpApi API key
 - Hugging Face API key
+- Redis instance (local or cloud)
 
 ### Installation
 
@@ -45,11 +50,13 @@ A personalized fashion recommendation platform that allows users to upload image
    ```
    cp .env.example .env
    ```
-   Then edit the `.env` file and add your API keys:
+   Then edit the `.env` file and add your API keys and Redis configuration:
    ```
    OPENAI_API_KEY=your_openai_api_key
    SERPAPI_API_KEY=your_serpapi_api_key
    HUGGINGFACE_API_KEY=your_huggingface_api_key
+   REDIS_URL=your_redis_url
+   SEARCH_LIMIT=5
    ```
 
 ### Running the Application
@@ -69,6 +76,26 @@ A personalized fashion recommendation platform that allows users to upload image
 - `POST /api/search` - Search for products based on a query
   - Accepts: query string
   - Returns: list of product results with descriptions, prices, and links
+  - Includes search tracking and rate limiting
+
+## Search Tracking and Rate Limiting
+
+The application implements search tracking and rate limiting using Redis:
+
+- Each user's searches are tracked with a daily limit
+- Search data is stored in Redis with automatic expiration
+- Rate limiting is configurable via the `SEARCH_LIMIT` environment variable
+- Fallback to in-memory storage when Redis is unavailable
+- Search history is maintained for each user
+
+### Redis Implementation
+
+The Redis implementation includes:
+
+- Connection management with automatic reconnection
+- Search count tracking per user
+- Search history storage (last 100 searches)
+- Rate limit enforcement
 
 ## How It Works
 
@@ -123,3 +150,26 @@ Users must sign in with Google to access these routes.
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Setting up Vercel KV (Redis)
+
+This application uses Vercel KV (Redis) to track user searches and implement search limits. To set up Vercel KV:
+
+1. Install Vercel KV in your project:
+   ```bash
+   vercel kv add
+   ```
+
+2. Follow the prompts to create a new KV database.
+
+3. Vercel will automatically add the necessary environment variables to your project:
+   - `KV_URL`
+   - `KV_REST_API_URL`
+   - `KV_REST_API_TOKEN`
+   - `KV_REST_API_READ_ONLY_TOKEN`
+
+4. For local development, create a `.env.local` file with the same environment variables.
+
+## Search Limits
+
+The application limits users to 5 searches per day. This is implemented using Vercel KV to track search counts.

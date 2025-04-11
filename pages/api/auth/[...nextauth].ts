@@ -8,7 +8,7 @@ export default NextAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
     }),
   ],
-  debug: true,
+  debug: process.env.NODE_ENV === "development",
   pages: {
     signIn: "/auth/signin",
     error: "/auth/error",
@@ -24,17 +24,18 @@ export default NextAuth({
       return url.startsWith(baseUrl) ? url : baseUrl;
     },
     async session({ session, token }) {
+      if (session?.user) {
+        session.user.id = token.sub;
+      }
       return session;
     },
     async jwt({ token, user, account }) {
       if (account && user) {
-        return {
-          ...token,
-          accessToken: account.access_token,
-          userId: user.id,
-        };
+        token.accessToken = account.access_token;
+        token.userId = user.id;
       }
       return token;
     },
   },
+  secret: process.env.NEXTAUTH_SECRET,
 }); 

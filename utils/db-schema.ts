@@ -39,13 +39,28 @@ export interface Search {
 
 // Example of how to implement search limits
 export async function checkSearchLimit(userId: string): Promise<boolean> {
-  // In a real application, you would query your database
-  // For now, we'll just return true to allow all searches
-  return true;
+  try {
+    // Use the Redis implementation
+    const { checkSearchLimit } = await import('./redis');
+    return checkSearchLimit(userId);
+  } catch (error) {
+    console.error('Error using Redis for search limit, falling back to memory store:', error);
+    // Fallback to memory store
+    const { checkSearchLimit } = await import('./memory-store');
+    return checkSearchLimit(userId);
+  }
 }
 
 // Example of how to track a search
 export async function trackSearch(userId: string, searchData: Omit<Search, 'id' | 'userId'>): Promise<void> {
-  // In a real application, you would save this to your database
-  console.log(`Search tracked for user: ${userId}`);
+  try {
+    // Use the Redis implementation
+    const { trackSearch } = await import('./redis');
+    await trackSearch(userId, searchData);
+  } catch (error) {
+    console.error('Error using Redis for tracking search, falling back to memory store:', error);
+    // Fallback to memory store
+    const { trackSearch } = await import('./memory-store');
+    await trackSearch(userId, searchData);
+  }
 } 

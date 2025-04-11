@@ -1,39 +1,48 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import { getToken } from "next-auth/jwt";
 import { getSession } from "next-auth/react";
-import { requireAuth } from "../../../utils/auth";
-import { trackSearch } from "../../../utils/db-schema";
+import { checkSearchLimit, trackSearch } from "../../../utils/db-schema";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  return requireAuth(req, res, async (req, res) => {
-    if (req.method === "POST") {
-      const session = await getSession({ req });
-      const userId = session?.user?.email;
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  try {
+    let userId = null;
+    try {
+      const token = await getToken({ 
+        req, 
+        secret: process.env.NEXTAUTH_SECRET 
+      });
       
-      if (!userId) {
-        return res.status(401).json({ error: "User not authenticated" });
+      if (token?.email) {
+        userId = token.email;
+      } else {
+        const session = await getSession({ req });
+        if (session?.user?.email) {
+          userId = session.user.email;
+        }
       }
-      
-      try {
-        const { timestamp, query, results } = req.body;
-        
-        // Track the search in our database
-        await trackSearch(userId, {
-          timestamp: timestamp ? new Date(timestamp) : new Date(),
-          query: query || {},
-          results: results || {}
-        });
-        
-        return res.status(200).json({
-          success: true,
-          message: "Search tracked successfully",
-          userId
-        });
-      } catch (error) {
-        console.error("Error tracking search:", error);
-        return res.status(500).json({ error: "Failed to track search" });
-      }
+    } catch (authError) {
+      console.error("[track.ts] Error getting authentication:", authError);
     }
     
-    return res.status(405).json({ error: "Method not allowed" });
-  });
+    if (!userId) {      
+      return res.status(401).json({ error: "Authentication required" });
+    }
+    
+    const canSearch = await checkSearchLimit(userId);
+    
+    if (!canSearch) {
+      return res.status(429).json({ error: "Search limit reached" });
+    }
+    
+    await trackSearch(userId, req.body);
+    
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    console.error("[track.ts] Error in search tracking:", error);
+    return res.status(500).json({ error: "Failed to track search" });
+  }
 } 
