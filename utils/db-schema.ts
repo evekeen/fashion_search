@@ -56,11 +56,21 @@ export async function trackSearch(userId: string, searchData: Omit<Search, 'id' 
   try {
     // Use the Redis implementation
     const { trackSearch } = await import('./redis');
-    await trackSearch(userId, searchData);
+    const fullSearchData: Search = {
+      ...searchData,
+      id: crypto.randomUUID(),
+      userId
+    };
+    await trackSearch(userId, fullSearchData);
   } catch (error) {
     console.error('Error using Redis for tracking search, falling back to memory store:', error);
     // Fallback to memory store
     const { trackSearch } = await import('./memory-store');
-    await trackSearch(userId, searchData);
+    const fullSearchData: Search = {
+      ...searchData,
+      id: crypto.randomUUID(),
+      userId
+    };
+    await trackSearch(userId, fullSearchData);
   }
 } 
